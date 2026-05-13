@@ -1,0 +1,19 @@
+[project]
+name = "DocumentDataset2"
+version = "2.0.0"
+description = "Tool to create a Document Dataset that can be used to train AI models."
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "numpy>=2.4.3",
+    "pdf2image>=1.17.0",
+    "pqdm>=0.2.0",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.13.3",
+    "pydantic-settings>=2.14.0",
+    "pymongo>=4.16.0",
+    "pyqt6>=6.10.2",
+    "pytest>=9.0.3",
+    "sqlalchemy>=2.0.48",
+]
