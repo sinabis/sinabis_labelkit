@@ -1,4 +1,4 @@
-# Document Labeling Tool
+# Sinabis LabelKit
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-GPL--30-orange.svg)]()
@@ -38,8 +38,8 @@
 
 ```bash
 # Clone the repo
-git clone git@gitlab.sina-cluster.com:f.stahl/docds2.git
-cd docds2
+git clone git@github.com:sinabis/sinabis_labelkit.git
+cd sinabis_labelkit
 
 # Create virtual environment und install dependencies
 uv sync
@@ -87,7 +87,7 @@ Easily decompose large PDFs into documents with correlated pages by drawing quic
 ### 🔴 Split
 Draw a vertical line between two pages of a document to split the document at that point.
 
-![Split Video](assets/split.mp4)
+![Split Video](assets/split.gif)
 
 ### 🟢 Merge
 Draw a horizontal line between two documents to combine them.
@@ -97,7 +97,7 @@ Requirements:
 - Part of the same original file
 - Share the same junk status (clean or flagged)
 
-![Merge Video](assets/merge.mp4)
+![Merge Video](assets/merge.gif)
 
 ### 🔵 Cluster
 Draw a horizontal line across one page — or between two pages — to assign that range to a new document.
@@ -107,7 +107,7 @@ The action preserves context:
 - If pages exist after the selection → new document for the suffix
 - Result: 1–3 new documents, depending on selection scope
 
-![Cluster Video](assets/cluster.mp4)
+![Cluster Video](assets/cluster.gif)
 
 
 ## 🧪 Tests
