@@ -45,7 +45,7 @@ cd sinabis_labelkit
 uv sync
 ```
 
-Create a copy  od `.env.example` and store it as `.env` . Choose either **postgres** or **mongodb** as backend, and modify database properties if necessary.
+Create a copy  of `.env.example` and store it as `.env` . Choose either **postgres** or **mongodb** as backend, and modify database properties if necessary.
 ```env
 # === Global Backend Selector ===
 DB_BACKEND          = postgres
