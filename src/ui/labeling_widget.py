@@ -560,8 +560,9 @@ class PageCanvas(QGraphicsView):
             for page_key in self._connected_pixmaps:
                 rect = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
                 for child in rect.childItems():
-                    child.fade_out.start()
+                    child.fade_out.finished.disconnect()
                     child.fade_out.finished.connect(lambda c = child: c.setPixmap(self._empty_pixmap))
+                    child.fade_out.start()
             self._connected_pixmaps.clear()
             return
 
