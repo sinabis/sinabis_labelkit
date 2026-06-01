@@ -48,6 +48,7 @@ class CaseStore:
 
     def __delitem__(self, case: str):
         del self._case_to_path[case]
+        self._write_case_file()
 
 
     def __len__(self) -> int:
