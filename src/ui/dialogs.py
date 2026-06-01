@@ -116,7 +116,7 @@ class ResolveCasePathDialog(QDialog):
 
         # = Layout =
         grid_layout     = QGridLayout()
-        grid_layout.addWidget(QLabel("Select Root Directory for Case '{}'".format(case).format()), 0, 0, 1, 2)
+        grid_layout.addWidget(QLabel("Select Root Directory for Case '{}'".format(case)), 0, 0, 1, 2)
         grid_layout.addWidget(self._path_edit, 1, 0)
         grid_layout.addWidget(self._browse_button, 1, 1)
         grid_layout.addWidget(self._dir_errors, 2, 0, 1, 2)
