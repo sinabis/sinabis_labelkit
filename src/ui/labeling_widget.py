@@ -240,6 +240,7 @@ class PageCanvas(QGraphicsView):
 
     # === Public Methods ===
 
+
     def focus_page(self, item: QGraphicsItem):
         """
         Moved the viewport so that a given item is centered.
@@ -440,6 +441,7 @@ class PageCanvas(QGraphicsView):
 
     # === Private Methods ===
 
+
     def _reset_selection(self):
         """
         Reset highlighting for currently selected UI items.
@@ -615,6 +617,7 @@ class PageCanvas(QGraphicsView):
 
 
     # === Native / Overriden Methods ===
+
 
     def keyPressEvent(self, event: QKeyEvent):
         key                     = event.key()

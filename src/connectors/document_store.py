@@ -16,32 +16,51 @@ class _NO_DOCTYPE:
 NO_DOCTYPE = _NO_DOCTYPE()
 
 
+
 class CaseNotFoundException(Exception):
     pass
+
+
 
 class DuplicateException(Exception):
     pass
 
+
+
 class EmptyUpdateException(Exception):
     pass
+
+
 
 class IdentifierNotFoundException(Exception):
     pass
 
+
+
 class InvalidIdentifierException(Exception):
     pass
+
+
 
 class InvalidPageIntervalException(Exception):
     pass
 
+
+
 class InvalidPageNumberException(Exception):
     pass
+
+
 
 class UniquePageToDocumentAssignmentException(Exception):
     pass
 
+
+
 class ExportException(Exception):
     pass
+
+
 
 class ImportException(Exception):
     pass

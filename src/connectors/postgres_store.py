@@ -132,10 +132,8 @@ class PageAssignment(Base):
 
 
 
-
-
-
 class PostgresStore(DocumentStore):
+
     def __init__(self, config: DatabaseConfig):
         super().__init__()
         self._config    = config
@@ -269,7 +267,6 @@ class PostgresStore(DocumentStore):
         return doc_id
 
 
-
     def update(self,
             identifier: int,
             path:       str | None                              = None,
@@ -376,7 +373,6 @@ class PostgresStore(DocumentStore):
                 raise UniquePageToDocumentAssignmentException
 
         return True
-
 
 
     def find(self,

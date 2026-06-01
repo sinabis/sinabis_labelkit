@@ -7,7 +7,6 @@ from .data_classes import LineOperation, UIConstants as UIC
 
 
 
-
 class MultiColorRectItem(QGraphicsRectItem):
 
     def __init__(self, rect: QRectF, colors: list[QColor], parent: QGraphicsItem | None = None):

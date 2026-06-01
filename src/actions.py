@@ -9,12 +9,15 @@ from .connectors import DocumentStore, InvalidIdentifierException, IdentifierNot
 DOCUMENT_INSERTION_KEYS = ['identifier', 'case', 'path', 'pages', 'doctypes', 'junk']
 
 
+
 class MergeException(Exception):
     pass
 
 
+
 class SplitException(Exception):
     pass
+
 
 
 class ClusterException(Exception):
@@ -27,11 +30,14 @@ class Action(ABC):
     def do(self):
         raise NotImplementedError
 
+
     def undo(self):
         raise NotImplementedError
 
+
     def redo(self):
         raise NotImplementedError
+
 
     def __repr__(self) -> str:
         raise NotImplementedError

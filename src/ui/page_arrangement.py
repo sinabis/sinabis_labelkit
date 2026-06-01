@@ -10,7 +10,6 @@ from .data_classes import RectData, UIConstants as UIC
 
 class AbstractPageArrangement(abc.ABC):
 
-
     def __init__(self, view: QGraphicsView, transform: QTransform | None = None):
         """
         Abstract base class for page arrangements that holds a view and associated transformation attributes in order to keep states when switching between arrangements

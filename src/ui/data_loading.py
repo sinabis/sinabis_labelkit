@@ -24,6 +24,7 @@ class FileLoader(QRunnable):
 
     _registry: dict[str, Type[FileLoader]] = {}
 
+
     def __init__(self, key: PageKey, case_store: CaseStore, loaded_callback: Callable[[PageKey, QPixmap], None]):
         super().__init__()
         self._key           = key
@@ -85,6 +86,7 @@ class FileLoader(QRunnable):
         self._deprecated.set()
 
 
+
 @FileLoader.register_loader('.pdf')
 class PdfLoader(FileLoader):
 
@@ -107,8 +109,17 @@ class PdfLoader(FileLoader):
 
 
 @FileLoader.register_loader('.png')
+
+
+
 @FileLoader.register_loader('.jpg')
+
+
+
 @FileLoader.register_loader('.jpeg')
+
+
+
 @FileLoader.register_loader('.bmp')
 class ImageLoader(FileLoader):
 

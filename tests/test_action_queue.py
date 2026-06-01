@@ -140,6 +140,7 @@ class TestCluster:
         for doc in initial_test_docs:
             store.insert(**doc)
 
+
     def test_cluster(self, store, action_manager, id_to_doc):
         doc_id_to_cluster   = 7
         org_doc             = id_to_doc[doc_id_to_cluster]
@@ -355,7 +356,6 @@ class TestDoctypeAssign:
                 action_manager.undo()
 
 
-
     def test_doctype_assign_invalid_id(self, store, action_manager):
         for id_ in [None, 3.5]:
             with pytest.raises(connectors.InvalidIdentifierException):
@@ -386,6 +386,7 @@ class TestJunkAssign:
             assert changed_doc[0][key] == org_doc[key]
         assert changed_doc[0]['junk'] != org_doc['junk']
 
+
     def test_junk_assign_undo(self, store, action_manager, normalized_test_docs):
         id_to_change    = 13
         action_manager.do(actions.AssignJunkAction(store, id_to_change, True))
@@ -408,7 +409,6 @@ class TestJunkAssign:
         for key in KEYS_TO_COMPARE - set(['junk']):
             assert changed_doc[0][key] == org_doc[key]
         assert changed_doc[0]['junk'] != org_doc['junk']
-
 
 
     def test_junk_assign_invalid_id(self, store, action_manager):

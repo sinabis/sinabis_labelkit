@@ -4,6 +4,7 @@ from PyQt6.QtCore import QPointF
 from typing import Any
 
 
+
 class RectData(IntEnum):
     DOC_ID      = 0
     CASE        = 1
@@ -13,10 +14,12 @@ class RectData(IntEnum):
     JUNK        = 5
 
 
+
 class ArrangementType(Enum):
     PAGE        = 0
     DOCUMENT    = 1
     LABELING    = 2
+
 
 
 class LineOperation(Enum):
@@ -26,10 +29,12 @@ class LineOperation(Enum):
     MERGE       = 3
 
 
+
 @dataclass(frozen = True)
 class MagnetLink:
     source_pos:     QPointF
     target_pos:     QPointF
+
 
 
 @dataclass(frozen = True)
@@ -43,6 +48,7 @@ class ClusterMagnetLink(MagnetLink):
         return LineOperation.CLUSTER
 
 
+
 @dataclass(frozen = True)
 class MergeMagnetLink(MagnetLink):
     doc_id_1:       Any
@@ -51,6 +57,7 @@ class MergeMagnetLink(MagnetLink):
     @property
     def operation(self) -> LineOperation:
         return LineOperation.MERGE
+
 
 
 @dataclass(frozen = True)
@@ -70,6 +77,7 @@ class CacheKey:
     page_number:    int
 
 
+
 @dataclass(frozen = True)
 class PageKey:
     doc_id:         Any
@@ -77,6 +85,7 @@ class PageKey:
     path:           str
     page_number:    int
     dpi:            int
+
 
 
 @dataclass(frozen = True)
