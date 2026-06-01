@@ -46,7 +46,7 @@ class File(Base):
     __table_args__          = (UniqueConstraint('case_id', 'path', name = 'uq_file_case_path'),)
 
     # many-to-one: File → Case
-    case: Mapped[Case]      = relationship(back_populates="files")
+    case: Mapped[Case]      = relationship(back_populates = "files")
 
     # one-to-many: File → Page
     pages: Mapped[list[Page]] = relationship(
