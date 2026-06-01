@@ -6,13 +6,13 @@ from src.config import DatabaseConfig
 try:
     from .mongo_store import MongoStore
     print("INFO: Backend 'MongoDB' available")
-except:
+except ImportError:
     pass
 
 try:
     from .postgres_store import PostgresStore
     print("INFO: Backend 'Postgres' available")
-except:
+except ImportError:
     pass
 
 
