@@ -721,7 +721,7 @@ class PageCanvas(QGraphicsView):
         items           = self.scene().items(visible_rect)
         rect_items      = [item for item in items if isinstance(item, QGraphicsRectItem)]
         if not rect_items:
-            return
+            return []
 
         # Sort rect_items by global index (magnet link construction relies on consecutive pages)
         rect_items.sort(key = lambda x: self._page_id_to_index[(x.data(RectData.DOC_ID), x.data(RectData.PAGE_NUMBER))])
