@@ -308,7 +308,7 @@ class MergeAction(Action):
 
 
     def __repr__(self) -> str:
-        return "Merging Documents '{}' and '{}'".format(self._doc_id_1, self._doc_id_1)
+        return "Merging Documents '{}' and '{}'".format(self._doc_id_1, self._doc_id_2)
 
 
 
