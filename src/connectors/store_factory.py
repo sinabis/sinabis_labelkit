@@ -17,7 +17,7 @@ except:
 
 
 def create_store(
-    backend:    Literal["postgres", "mongo"],
+    backend:    Literal["postgres", "mongodb"],
     config:     DatabaseConfig
 ) -> DocumentStore:
     if backend == "postgres":
