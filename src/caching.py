@@ -44,7 +44,7 @@ class PriorityCache:
             key:        Any serializable object
             value:      Any serializable object
             priority:   Any sortable object, where for two objects (x, y), y has a higher priority iff x < y
-        
+
         Returns:
             A bool indicating if a new entry was added to the buffer
         """
@@ -74,7 +74,7 @@ class PriorityCache:
                 self._last_access[key] = time.time()
                 return self._data[key]
         raise NotInCacheException("Key '{}' not found in cache!".format(key))
-        
+
 
     def contains(self, key: Any, min_priority: Any = None) -> bool:
         """
@@ -88,8 +88,8 @@ class PriorityCache:
             A bool indicating if the entry was found
         """
         return key in self._priorities and (min_priority is None or self._priorities[key] >= min_priority)
-    
-    
+
+
     def keys(self) -> KeysView[Any]:
         """
         Returns a set of all keys currently stored inside the cache.

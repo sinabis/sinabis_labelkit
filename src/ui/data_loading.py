@@ -85,7 +85,7 @@ class FileLoader(QRunnable):
 
 
 @FileLoader.register_loader('.pdf')
-class PdfLoader(FileLoader):    
+class PdfLoader(FileLoader):
 
     @pyqtSlot()
     def run(self):

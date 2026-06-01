@@ -13,7 +13,7 @@ class MultiColorRectItem(QGraphicsRectItem):
     def __init__(self, rect: QRectF, colors: list[QColor], parent: QGraphicsItem | None = None):
         """
         A regular QGraphicsRectItem with the additional feature that it can have several background colors which are horizontally aligned with equal spacing.
-        
+
         Args:
             rect:   The geometry of the item
             colors: A list of QColors
@@ -46,7 +46,7 @@ class StripedColorRectItem(QGraphicsRectItem):
     def __init__(self, rect: QRectF, colors: list[QColor], parent: QGraphicsItem | None = None):
         """
         A Rectangle that behaves like a MultiColorRectItem, with an additional diagonal stripe pattern overlayed.
-        
+
         Args:
             rect:   The geometry of the item
             colors: A list of QColors
@@ -87,7 +87,7 @@ class StripedColorRectItem(QGraphicsRectItem):
             else:
                 painter.setBrush(self._brush_2)
             painter.drawPolygon(polygon)
-            
+
         # Draw border
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
@@ -96,7 +96,7 @@ class StripedColorRectItem(QGraphicsRectItem):
 
 
 class ContrastLineItem(QGraphicsItemGroup):
-    
+
     def __init__(self, p1: QPointF, p2: QPointF, operation: LineOperation = LineOperation.INVALID, parent: QGraphicsItem | None = None):
         """
         A class to provide a line with a larger one behind it with a constrastive background color. Inteded to distinguish the line better over varying background items.
@@ -107,31 +107,31 @@ class ContrastLineItem(QGraphicsItemGroup):
             operation:  The type of operation that the line triggers once dropped.
         """
         super().__init__(parent)
-    
+
         self._operation = operation
 
         self._p1        = p1
         self._p2        = p2
 
-        self._outer     = QGraphicsLineItem()    
+        self._outer     = QGraphicsLineItem()
         self._inner     = QGraphicsLineItem()
 
         self._outer_pen = QPen(QColor(*UIC.line_color_glow), UIC.line_outer_width)
         self._outer.setPen(self._outer_pen)
         self.addToGroup(self._outer)
 
-        
+
         self._inner_pen = QPen(QColor(*UIC.line_color_invalid), UIC.line_inner_width)
         self._inner.setPen(self._inner_pen)
         self.addToGroup(self._inner)
-        
+
         self._update_line()
 
 
     @property
     def operation(self) -> LineOperation:
         return self._operation
-        
+
 
     @operation.setter
     def operation(self, operation: LineOperation):
@@ -163,7 +163,7 @@ class ContrastLineItem(QGraphicsItemGroup):
 
     def _update_line(self):
         self._line      = QLineF(self._p1, self._p2)
-        
+
         # Rendering for lines with a length of zero is undefined; Set a minimal length resulting in a square
         if self._line.length() < UIC.epsilon:
             self._line = QLineF(self._p1, self._p2 + QPointF(UIC.epsilon, 0))

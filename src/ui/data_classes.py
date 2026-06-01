@@ -81,7 +81,7 @@ class PageKey:
 
 @dataclass(frozen = True)
 class UIConstants:
-    
+
     # General
     epsilon:                float       = 0.0001
 
@@ -106,7 +106,7 @@ class UIConstants:
     page_arrangement_scale: float       = 300
     doc_arrangement_scale:  float       = 300
     lab_arrangement_scale:  float       = 1400
-    gap_between_pages:      float       = 0.02 
+    gap_between_pages:      float       = 0.02
     gap_between_documents:  float       = 0.2
     page_rect_width:        float       = 0.6
     page_rect_height:       float       = 1.0   # 1.0 ~ Screen Height

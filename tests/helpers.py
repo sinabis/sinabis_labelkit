@@ -17,7 +17,7 @@ def normalize_doc(doc: dict[str, Any]) -> dict[str, Any]:
         "doctypes":     sorted(doctypes),
         "junk":         doc["junk"] if "junk" in doc else False
     }
-    
+
     if 'identifier' in doc:
         ret_doc['identifier'] = doc['identifier']
 

@@ -24,9 +24,9 @@ class MongoStore(DocumentStore):
         self._collection.create_index([("case", pm.ASCENDING), ("path", pm.ASCENDING), ("pages", pm.ASCENDING)], unique = True)
 
 
-    def insert(self, 
+    def insert(self,
             case:       str,
-            path:       str, 
+            path:       str,
             pages:      int | list[int],
             identifier: int | None              = None,
             doctypes:   str | list[str] | None  = None,
@@ -48,7 +48,7 @@ class MongoStore(DocumentStore):
             raise InvalidPageNumberException("Page number '{}' is invalid!".format(pages))
 
         if doctypes is None:
-            doctypes    = [] 
+            doctypes    = []
         elif isinstance(doctypes, str):
             doctypes    = [doctypes]
 
@@ -58,7 +58,7 @@ class MongoStore(DocumentStore):
             "pages":        sorted(pages),
             "doctypes":     sorted(doctypes),
             "junk":         junk,
-            "created_at":   dt.datetime.now(), 
+            "created_at":   dt.datetime.now(),
             "updated_at":   dt.datetime.now()
         }
         if identifier is not None:
@@ -68,7 +68,7 @@ class MongoStore(DocumentStore):
             result = self._collection.insert_one(doc)
         except DuplicateKeyError as e:
             raise DuplicateException(str(e))
-        
+
         return result.inserted_id
 
 
@@ -133,7 +133,7 @@ class MongoStore(DocumentStore):
 
         if isinstance(path, str):
             query['path']       = path
-        
+
         if isinstance(pages, list):
             query['pages']      = {'$all': pages}
         elif isinstance(pages, int):
@@ -171,13 +171,13 @@ class MongoStore(DocumentStore):
     def find_documents_in_page_range(self,
             case:       str,
             path:       str,
-            page_min:   int, 
+            page_min:   int,
             page_max:   int
         ) -> list[dict[str, Any]]:
-        
+
         if page_min > page_max or min(page_min, page_max) < 0:
             raise InvalidPageIntervalException("[{}, {}] is an invalid Interval!".format(page_min, page_max))
-        
+
         query = {
             "case": case,
             "path": path,
@@ -194,7 +194,7 @@ class MongoStore(DocumentStore):
         return results
 
 
-    def delete(self, 
+    def delete(self,
             identifier: int | None  = None,
             case:       str | None  = None
         ) -> int:
@@ -254,7 +254,7 @@ class MongoStore(DocumentStore):
     def _highest_id(self) -> int:
         """
         Returns the highest known ID, or -1 if no ID has been assigned yet.
-        
+
         Returns:
             The highest ID
         """
@@ -269,6 +269,6 @@ class MongoStore(DocumentStore):
         Sets the highest ID.
 
         Args:
-            identifier: The new highest ID        
+            identifier: The new highest ID
         """
         self._counter_collection.update_one({}, {'$set': {"max_id": identifier}}, upsert = True)

@@ -15,8 +15,8 @@ from PyQt6.QtGui import QBrush, QAction, QColor, QFont, QKeyEvent, QMouseEvent, 
 
 
 ARRANGEMENT_CLASS_ASSIGNMENTS = {
-    ArrangementType.PAGE:       PagewiseArrangement, 
-    ArrangementType.DOCUMENT:   DocumentwiseArrangement, 
+    ArrangementType.PAGE:       PagewiseArrangement,
+    ArrangementType.DOCUMENT:   DocumentwiseArrangement,
     ArrangementType.LABELING:   LabelingArrangement
 }
 
@@ -39,7 +39,7 @@ def _create_page_item(
     Args:
         document:       A dict containing the required data fields
         page_geometry:  A QRectF as default page geometry
-        pixmap:         A default pixmap overlayed over the rectangle as child 
+        pixmap:         A default pixmap overlayed over the rectangle as child
     """
     colors = [utils.color_from_class(d) for d in (document['doctypes'] if document['doctypes'] else [None])]
     if document['junk']:
@@ -64,7 +64,7 @@ def _create_page_item(
     fade_in_anim.setStartValue(0.0)
     fade_in_anim.setEndValue(1.0)
     pixmap_item.fade_in = fade_in_anim
-    
+
     fade_out_anim = QPropertyAnimation(opacity_effect, b"opacity")
     fade_out_anim.setDuration(UIC.fade_out_duration)
     fade_out_anim.setStartValue(1.0)
@@ -185,7 +185,7 @@ class PageCanvas(QGraphicsView):
     @property
     def case_filter(self) -> set[str] | None:
         return self._case_filter
-    
+
 
     @case_filter.setter
     def case_filter(self, case_filter: set[str] | None):
@@ -196,7 +196,7 @@ class PageCanvas(QGraphicsView):
     @property
     def doctype_filter(self) -> set[str | connectors._NO_DOCTYPE] | None:
         return self._doctype_filter
-    
+
 
     @doctype_filter.setter
     def doctype_filter(self, doctype_filter: set[str | connectors._NO_DOCTYPE] | None):
@@ -206,7 +206,7 @@ class PageCanvas(QGraphicsView):
     @property
     def junk_filter(self) -> bool:
         return self._junk_filter
-    
+
 
     @junk_filter.setter
     def junk_filter(self, junk_filter: bool):
@@ -217,7 +217,7 @@ class PageCanvas(QGraphicsView):
     @property
     def arrangement_type(self) -> ArrangementType:
         return self._arrangement_type
-    
+
 
     @arrangement_type.setter
     def arrangement_type(self, arrangement_type: ArrangementType):
@@ -237,7 +237,7 @@ class PageCanvas(QGraphicsView):
             return self._doc_id_to_doc[self._selected_doc_id]
         else:
             return None
-        
+
 
     # === Public Methods ===
 
@@ -292,7 +292,7 @@ class PageCanvas(QGraphicsView):
 
         # Deselect previous selection (does not trigger a signal)
         self._reset_selection()
-                
+
         # Select pages
         if doc_id:
             self._apply_selection(doc_id)
@@ -302,7 +302,7 @@ class PageCanvas(QGraphicsView):
         self.prev_sel_available.emit(self._selected_doc_id is not None and len(self._page_items) and self._page_items[0].data(RectData.DOC_ID) != self._selected_doc_id)
         self.next_sel_available.emit(self._selected_doc_id is not None and len(self._page_items) and self._page_items[-1].data(RectData.DOC_ID) != self._selected_doc_id)
 
-    
+
     def select_previous_document(self):
         """
         If there is a document currently selected, find, select and focus the previous document.
@@ -420,12 +420,12 @@ class PageCanvas(QGraphicsView):
                 for rect in rects:
                     if not rect in scene_items:
                         self.scene().addItem(rect)
-            
+
             for page_number in doc['pages']:
                 page_id = (doc['identifier'], page_number)
                 self._page_id_to_index[page_id] = len(self._page_items)
-                self._page_items.append(self._page_id_to_rect[page_id])    
-        
+                self._page_items.append(self._page_id_to_rect[page_id])
+
         # Arrange page items
         self.update_page_arrangement()
 
@@ -539,7 +539,7 @@ class PageCanvas(QGraphicsView):
 
     def _ensure_visible_pages_loaded(self):
         """
-        Performs a viewport check over all page items. When close enough queues pixmap dataloading jobs to a thread pool. 
+        Performs a viewport check over all page items. When close enough queues pixmap dataloading jobs to a thread pool.
         Uses caching to buffer pixmaps in different zoom levels. Only one concurrent check is allowed.
         """
         # Avoid rapid checks, i.e. for scrolling, enqueue a final check
@@ -553,12 +553,12 @@ class PageCanvas(QGraphicsView):
         scale = self.transform().m11() # (assumes uniform scaling!)
 
         # Too far away to show page content -> Remove pixmaps from view (not from cache)
-        if scale < UIC.zoom_hide_images: 
+        if scale < UIC.zoom_hide_images:
             for page_key in self._loading_pixmaps:
                 self._removed_pixmaps.add(page_key)
             for page_key in self._connected_pixmaps:
                 rect = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
-                for child in rect.childItems():  
+                for child in rect.childItems():
                     child.fade_out.start()
                     child.fade_out.finished.connect(lambda c = child: c.setPixmap(self._empty_pixmap))
             self._connected_pixmaps.clear()
@@ -640,7 +640,7 @@ class PageCanvas(QGraphicsView):
                 self.verticalScrollBar().setValue(self.verticalScrollBar().value() - self.height())
         elif key == Qt.Key.Key_PageDown:
             if allow_vertical_scroll:
-                self.verticalScrollBar().setValue(self.verticalScrollBar().value() + self.height())     
+                self.verticalScrollBar().setValue(self.verticalScrollBar().value() + self.height())
         else:
             super().keyPressEvent(event)
 
@@ -673,13 +673,13 @@ class PageCanvas(QGraphicsView):
     def wheelEvent(self, event: QWheelEvent):
 
         QTimer.singleShot(50, self._ensure_visible_pages_loaded)
-   
+
         # Wheel + CTRL -> Zoom
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             factor = UIC.zoom_step_factor if event.angleDelta().y() > 0 else 1 / UIC.zoom_step_factor
             self.scale(factor)
             return
-        
+
         # (Pagewise) Horizontal / Vertical Scrolling
         pagewise    = event.modifiers() & Qt.KeyboardModifier.ShiftModifier
         is_hor      = self._loaded_arrangements[self._arrangement_type].allow_horizontal_scrolling()
@@ -711,7 +711,7 @@ class PageCanvas(QGraphicsView):
     def _construct_magnet_links(self) -> list[MagnetLink]:
         """
         Document operations such as splitting, merging and clustering may be triggered by drawing lines with the mouse, and connecting certain key points.
-        If the user presses the mouse within a proximity radius around these so called magnets, the magnet points are stored along with their associated possible target points and actions. 
+        If the user presses the mouse within a proximity radius around these so called magnets, the magnet points are stored along with their associated possible target points and actions.
         When releasing the mouse within the proximity radius around one of these target points, the associated operation can then be applied to the documents.
         """
         # Get all pages on screen
@@ -720,7 +720,7 @@ class PageCanvas(QGraphicsView):
         rect_items      = [item for item in items if isinstance(item, QGraphicsRectItem)]
         if not rect_items:
             return
-        
+
         # Sort rect_items by global index (magnet link construction relies on consecutive pages)
         rect_items.sort(key = lambda x: self._page_id_to_index[(x.data(RectData.DOC_ID), x.data(RectData.PAGE_NUMBER))])
 
@@ -755,11 +755,11 @@ class PageCanvas(QGraphicsView):
             is_junk_1   = rect_items[i].data(RectData.JUNK)
             is_junk_2   = rect_items[i+1].data(RectData.JUNK)
             if doc_id_1 != doc_id_2 and path_1 == path_2 and doctypes_1 == doctypes_2 and is_junk_1 == is_junk_2:
-                doc1_end    = rect_items[i].sceneBoundingRect().center() 
+                doc1_end    = rect_items[i].sceneBoundingRect().center()
                 doc2_start  = rect_items[i+1].sceneBoundingRect().center()
                 merge_points.append(MergeMagnetLink(doc1_end, doc2_start, doc_id_1, doc_id_2))
                 merge_points.append(MergeMagnetLink(doc2_start, doc1_end, doc_id_1, doc_id_2))
-        
+
         # 3) Get all cluster points (page centers all pages of documents with more than 1 page)
         cluster_points  = []
         len_per_doc     = Counter(item.data(RectData.DOC_ID) for item in rect_items)
@@ -768,14 +768,14 @@ class PageCanvas(QGraphicsView):
             for j in range(len(rect_items)):
                 doc_id_2    = rect_items[j].data(RectData.DOC_ID)
                 if doc_id_1 == doc_id_2 and len_per_doc[doc_id_1] > 1:
-                    doc1_center = rect_items[i].sceneBoundingRect().center() 
+                    doc1_center = rect_items[i].sceneBoundingRect().center()
                     doc2_center = rect_items[j].sceneBoundingRect().center()
                     page_1      = rect_items[i].data(RectData.PAGE_NUMBER)
                     page_2      = rect_items[j].data(RectData.PAGE_NUMBER)
                     cluster_points.append(ClusterMagnetLink(doc1_center, doc2_center, doc_id_1, page_1, page_2))
-                    
+
         return split_points + merge_points + cluster_points
-    
+
 
     def mousePressEvent(self, event: QMouseEvent):
 
@@ -803,7 +803,7 @@ class PageCanvas(QGraphicsView):
 
         # Right Button -> Draw Line Start
         elif event.button() == Qt.MouseButton.RightButton:
-            
+
             # Too far away for drawing
             if self.transform().m11() < UIC.draw_max_zoom:
                 return
@@ -814,10 +814,10 @@ class PageCanvas(QGraphicsView):
             for magnet_point in magnet_points:
                 if utils.euclidean_distance(scene_pos, magnet_point.source_pos) < UIC.draw_max_snap_distance:
                     self._available_magnets.append(magnet_point)
-                    
+
             if not self._available_magnets:
                 return
-            
+
             self._draw_mode_delay_timer.start(int(1000 * UIC.draw_delay_time))
             self._line = ContrastLineItem(self._available_magnets[0].source_pos, self._available_magnets[0].source_pos, LineOperation.INVALID)
             self.scene().addItem(self._line)
@@ -826,7 +826,7 @@ class PageCanvas(QGraphicsView):
             for magnet_point in self._available_magnets:
                 top_left    = magnet_point.target_pos - QPointF(UIC.magnet_circle_radius / 2, UIC.magnet_circle_radius / 2)
                 circle      = QGraphicsEllipseItem(top_left.x(), top_left.y(), UIC.magnet_circle_radius, UIC.magnet_circle_radius)
-                
+
                 if magnet_point.operation == LineOperation.SPLIT:
                     circle_color = UIC.line_color_split
                 elif magnet_point.operation == LineOperation.MERGE:
@@ -899,7 +899,7 @@ class PageCanvas(QGraphicsView):
 
             if action:
                 self.store_operation.emit(action)
-            
+
             self._closest_magnet    = None
 
         # Right Button ->
@@ -914,7 +914,7 @@ class PageCanvas(QGraphicsView):
 
 
     def mouseMoveEvent(self, event: QMouseEvent):
-    
+
         scene_pos   = self.mapToScene(event.pos())
 
         # Update Drawing
@@ -932,8 +932,8 @@ class PageCanvas(QGraphicsView):
                 self._line.operation    = LineOperation.INVALID
                 self._closest_magnet    = None
                 return
-            
-            
+
+
 
             # Add a visual horizontal offset when a single page has been selected for clustering
             if closest_magnet.operation == LineOperation.CLUSTER and utils.euclidean_distance(closest_magnet.source_pos, closest_magnet.target_pos) < UIC.epsilon:
@@ -952,7 +952,7 @@ class PageCanvas(QGraphicsView):
         elif self._translation_start is not None:
 
             trans_vec   = scene_pos - self._translation_start
-            
+
             if not self._loaded_arrangements[self._arrangement_type].allow_vertical_scrolling():
                 trans_vec.setY(0)
             elif not self._loaded_arrangements[self._arrangement_type].allow_horizontal_scrolling():
@@ -960,7 +960,7 @@ class PageCanvas(QGraphicsView):
             self.translate(trans_vec.x(), trans_vec.y())
             self._ensure_visible_pages_loaded()
             return
-        
+
         return super().mouseMoveEvent(event)
 
 
@@ -984,7 +984,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
 
         self._init_application_settings()
-        
+
         self._validate_case_paths(store)
         self._validate_file_paths(store)
 
@@ -1039,7 +1039,7 @@ class MainWindow(QMainWindow):
             except (connectors.IdentifierNotFoundException, actions.MergeException):
                 ActionConflictDialog().exec()
             self._canvas.update_scene_items()
-        
+
 
     def redo(self):
         """
@@ -1072,7 +1072,7 @@ class MainWindow(QMainWindow):
                 self._labeling_box.keyPressEvent(event)
 
         return super().keyPressEvent(event)
-    
+
 
     def _init_application_settings(self):
         """Sets properties of the Application, such as disabling mouse double clicks or the latency between repeating keyboard inputs"""
@@ -1111,7 +1111,7 @@ class MainWindow(QMainWindow):
     def _init_page_canvas(self, store: connectors.DocumentStore):
         """
         Initializes the page canvas widget containing the graphics scene
-        
+
         Args:
             store: The document store
         """
@@ -1122,7 +1122,7 @@ class MainWindow(QMainWindow):
     def _init_menu_toolbar(self, store: connectors.DocumentStore):
         """
         Initializes the menu bar containing all action menus and icons
-        
+
         Args:
             store: The document store
         """

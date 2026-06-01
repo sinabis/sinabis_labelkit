@@ -50,7 +50,7 @@ def action_manager() -> actions.ActionManager:
 
 
 class TestMerge:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -141,7 +141,7 @@ class TestCluster:
 
     def test_cluster(self, store, action_manager, id_to_doc):
         doc_id_to_cluster   = 7
-        org_doc             = id_to_doc[doc_id_to_cluster] 
+        org_doc             = id_to_doc[doc_id_to_cluster]
         for cluster_pages in [[0, 1, 2], [2, 3], [2, 3, 4], [0, 1, 2, 3, 4], [4, 2, 3], [1]]:
             action_manager.do(actions.ClusterAction(store, doc_id_to_cluster, cluster_pages))
             all_ids             = set(store.identifiers())
@@ -178,7 +178,7 @@ class TestCluster:
 
     def test_cluster_undo_redo(self, store, action_manager, id_to_doc):
         doc_id_to_cluster   = 7
-        org_doc             = id_to_doc[doc_id_to_cluster] 
+        org_doc             = id_to_doc[doc_id_to_cluster]
         for cluster_pages in [[0, 1, 2], [2, 3], [2, 3, 4], [0, 1, 2, 3, 4], [4, 2, 3], [1]]:
             action_manager.do(actions.ClusterAction(store, doc_id_to_cluster, cluster_pages))
             action_manager.undo()
@@ -288,7 +288,7 @@ class TestSplit:
         for split_after in [-1, 3]:
             with pytest.raises(actions.SplitException):
                 action_manager.do(actions.SplitAction(store, doc_id_to_split, split_after))
-            
+
 
     def test_split_invalid_id(self, store, action_manager):
         for id_ in [None, 3.5]:
@@ -479,7 +479,7 @@ class TestChain:
 
         assert action_manager.undo_chain_length == 0
         assert action_manager.redo_chain_length == 0
-        
+
         action_manager.do(actions.MergeAction(store, 1, 2))
         assert action_manager.undo_chain_length == 1
         assert action_manager.redo_chain_length == 0
@@ -565,7 +565,7 @@ class TestChain:
             action_manager.redo()
             assert action_manager.undo_chain_length == i + 1
             assert action_manager.redo_chain_length == 11 - i - 1
-        
+
         for i in range(11):
             action_manager.undo()
             assert action_manager.undo_chain_length == 11 - i - 1

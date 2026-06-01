@@ -29,7 +29,7 @@ RAW_TEST_DOCS   = [
     {'case': 'caseC', 'path': 'strange_path with blank 2.pdf', 'pages': [0, 1, 2], 'doctypes': 'beschluss'},
     {'case': 'caseC', 'path': 'strange_path with blank 2.pdf', 'pages': [3, 4, 5], 'doctypes': None},
     {'case': 'caseC', 'path': 'strange_path with blank 2.pdf', 'pages': [6, 7, 9], 'doctypes': 'fax'},
-] 
+]
 
 
 
@@ -46,7 +46,7 @@ def initial_test_docs() -> list[dict[str, Any]]:
 
 
 class TestInsert:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -67,7 +67,7 @@ class TestInsert:
         assert len(docs_ret) == 1
         for key in KEYS_TO_COMPARE:
             assert special_doc_n[key] == docs_ret[0][key]
-    
+
 
     def test_insert_with_unavailable_id(self, store):
         first_id_doc    = store.find()[0]['identifier']
@@ -107,7 +107,7 @@ class TestFind:
     def test_find_all(self, store, normalized_test_docs):
         """
         # 1) all documents are returned
-        # 2) contain all necessary keys 
+        # 2) contain all necessary keys
         # 3) keys have correct values
         # 4) are in the correct order
         # 5) pages and doctypes are sorted lists
@@ -141,7 +141,7 @@ class TestFind:
         for (doc_ret, doc_gt) in zip(results, filtered_docs):
             for key in KEYS_TO_COMPARE:
                 assert doc_ret[key] == doc_gt[key]
-    
+
 
     def find_not_junk(self, store):
         results = store.find(junk = False)
@@ -264,7 +264,7 @@ class TestFind:
                 for key in KEYS_TO_COMPARE:
                     assert doc_ret[key] == doc_gt[key]
 
-    
+
     def test_find_invalid_range(self, store):
         search_case = 'caseA'
         search_path = "files/file_1.pdf"
@@ -449,7 +449,7 @@ class TestDelete:
 
 
 class TestIdentifiers:
-        
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -464,7 +464,7 @@ class TestIdentifiers:
 
 
 class TestCases:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -479,7 +479,7 @@ class TestCases:
 
 
 class TestDoctypes:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -526,11 +526,11 @@ class TestExport:
 
 
 class TestImport:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self):
         pass
-    
+
 
     def test_import(self, store, normalized_test_docs):
         dump_file   = "tmp/dump-temp.json"

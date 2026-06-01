@@ -33,13 +33,13 @@ def color_from_class(text: str, saturation: int = 200, light: int = 60, alpha: i
 
     # 1. Create a hash of the class name
     h = int(hashlib.sha256(text.encode()).hexdigest(), 16)
-    
+
     # 2. Map hash to hue (0–359)
     hue = h % 360
-    
+
     # 3. Use fixed saturation and lightness for consistency
     return QColor.fromHsl(hue, saturation, light, alpha)
-    
+
 
 
 def ls_rec(root_dir: str, filter: str | None = None) -> list[str]:
@@ -106,7 +106,7 @@ def open_file(path: str, page: int | None = None):
 
     except subprocess.CalledProcessError as e:
         raise RuntimeError("Failed to open file: {}".format(e))
-    
+
 
 
 def euclidean_distance(p1: QPointF, p2: QPointF) -> float:
@@ -159,7 +159,7 @@ def load_svg_as_pixmap(path: str, size: int, color: tuple) -> QPixmap:
 def load_icon(path: str) -> QIcon:
     """
     Loads an SVG icon, applies rescaling and re-coloring for active and disabled states according to a theme-specific color.
-    
+
     Args:
         path: The path to a vector graphic file (svg)
 
@@ -172,9 +172,9 @@ def load_icon(path: str) -> QIcon:
     temp_pixmap = QPixmap(size, size)
     temp_pixmap.fill(Qt.GlobalColor.transparent)
     renderer.render(QPainter(temp_pixmap))
-    
+
     icon        = QIcon()
-    
+
     def _render_pixmap(color):
         pixmap = QPixmap(size, size)
         pixmap.fill(Qt.GlobalColor.transparent)
@@ -190,7 +190,7 @@ def load_icon(path: str) -> QIcon:
 
     disabled_pixmap = _render_pixmap(palette.color(QPalette.ColorRole.PlaceholderText))
     icon.addPixmap(disabled_pixmap, QIcon.Mode.Disabled)
-    
+
     return icon
 
 

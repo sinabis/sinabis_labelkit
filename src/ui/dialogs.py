@@ -167,7 +167,7 @@ class ResolveCasePathDialog(QDialog):
                 valid = False
                 self._progress_msg.appendPlainText("File '{}' does not exist!".format(doc['path']))
             self._progress_bar.setValue(i)
-        
+
         if valid:
             self._progress_msg.appendPlainText("All Files found")
 
@@ -176,7 +176,7 @@ class ResolveCasePathDialog(QDialog):
 
 
 class WorkerThread(QRunnable):
-    
+
     def __init__(self, job_callback: Callable[[], None], on_exception: Callable[[Exception], None], on_success: Callable[[], None]):
         """
         A runnable class to execute a job callback, which might last a long time, in a thread, so that the UI never freezes.
@@ -587,7 +587,7 @@ class CreateCaseDialog(QDialog):
         """
         if self._case_root is None or self._case_name is None:
             return
-        
+
         files = utils.ls_rec(self._case_root)
         self._progress_bar.setMaximum(len(files))
         unknown_extensions = set()
@@ -668,4 +668,3 @@ class CreateCaseDialog(QDialog):
 
         self._check_button_states()
         self._case_root = case_root
-    

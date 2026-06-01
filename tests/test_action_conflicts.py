@@ -54,7 +54,7 @@ def action_manager_2() -> actions.ActionManager:
 
 
 class Test_Non_Existing_ID_Do:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -99,7 +99,7 @@ class Test_Non_Existing_ID_Do:
 
 
 class Test_Non_Existing_ID_Undo:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
