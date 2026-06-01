@@ -1,6 +1,7 @@
-from src.config import DatabaseConfig
-from .document_store import DocumentStore
 from typing import Literal
+
+from .document_store import DocumentStore
+from src.config import DatabaseConfig
 
 try:
     from .mongo_store import MongoStore

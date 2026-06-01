@@ -1,13 +1,13 @@
 import os
 import pdf2image
-from pdf2image.exceptions import PDFPageCountError
-from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QGridLayout, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QVBoxLayout, QWidget
-from PyQt6.QtCore import pyqtSlot, pyqtSignal, QObject, QRunnable, QThreadPool, QTimer
 import re
+from pdf2image.exceptions import PDFPageCountError
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, QObject, QRunnable, QThreadPool, QTimer
+from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QGridLayout, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QVBoxLayout, QWidget
 from typing import Callable
 
-from ..connectors import DocumentStore
 from .. import utils
+from ..connectors import DocumentStore
 from .data_loading import FileLoader
 
 VALID_DB_STRING_REGEX   = r"^[a-z0-9_-ßöüä]+$"

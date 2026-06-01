@@ -1,7 +1,8 @@
+import pytest
 from typing import Any
+
 import src.actions as actions
 import src.connectors as connectors
-import pytest
 from .helpers import normalize_doc
 
 

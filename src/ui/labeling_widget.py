@@ -1,17 +1,16 @@
-from .custom_items import ContrastLineItem, MultiColorRectItem, StripedColorRectItem, FoldableComboBox
-from .data_loading import FileLoader
-from .data_classes import ArrangementType, CacheKey, ClusterMagnetLink, LineOperation, MagnetLink, MergeMagnetLink, PageKey, RectData, SplitMagnetLink, UIConstants as UIC
-from .dialogs import ActionConflictDialog, CreateCaseDialog, CreateDoctypeDialog, ExportDialog, ImportDialog, MissingFilesDialog, ResolveCasePathDialog
-from .page_arrangement import AbstractPageArrangement, DocumentwiseArrangement, LabelingArrangement, PagewiseArrangement
-from .. import utils, connectors, caching, actions
-
-from collections import Counter, defaultdict
 import datetime as dt
 import os
-
-from PyQt6.QtWidgets import QApplication, QCheckBox, QDialog, QDockWidget, QGraphicsEllipseItem, QGraphicsItem, QGraphicsOpacityEffect, QToolButton, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QVBoxLayout, QHBoxLayout, QLabel, QMainWindow, QMenu, QPlainTextEdit, QPushButton, QToolBar, QWidget
+from collections import Counter, defaultdict
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QLineF, QPointF, QPropertyAnimation, QRect, QRectF, QSize, Qt, QThreadPool, QTimer
 from PyQt6.QtGui import QBrush, QAction, QColor, QFont, QKeyEvent, QMouseEvent, QPainter, QPen, QPixmap, QResizeEvent, QWheelEvent
+from PyQt6.QtWidgets import QApplication, QCheckBox, QDialog, QDockWidget, QGraphicsEllipseItem, QGraphicsItem, QGraphicsOpacityEffect, QToolButton, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QVBoxLayout, QHBoxLayout, QLabel, QMainWindow, QMenu, QPlainTextEdit, QPushButton, QToolBar, QWidget
+
+from .. import utils, connectors, caching, actions
+from .custom_items import ContrastLineItem, MultiColorRectItem, StripedColorRectItem, FoldableComboBox
+from .data_classes import ArrangementType, CacheKey, ClusterMagnetLink, LineOperation, MagnetLink, MergeMagnetLink, PageKey, RectData, SplitMagnetLink, UIConstants as UIC
+from .data_loading import FileLoader
+from .dialogs import ActionConflictDialog, CreateCaseDialog, CreateDoctypeDialog, ExportDialog, ImportDialog, MissingFilesDialog, ResolveCasePathDialog
+from .page_arrangement import AbstractPageArrangement, DocumentwiseArrangement, LabelingArrangement, PagewiseArrangement
 
 
 ARRANGEMENT_CLASS_ASSIGNMENTS = {

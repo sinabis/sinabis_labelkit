@@ -1,7 +1,8 @@
 from abc import ABC
-from .connectors import DocumentStore, InvalidIdentifierException, IdentifierNotFoundException, NO_DOCTYPE, _NO_DOCTYPE
 from collections import deque
 from PyQt6.QtCore import pyqtSignal, QObject
+
+from .connectors import DocumentStore, InvalidIdentifierException, IdentifierNotFoundException, NO_DOCTYPE, _NO_DOCTYPE
 
 
 

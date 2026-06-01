@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
-import src.utils as utils
+import threading
 from pdf2image import convert_from_path
 from PIL import Image
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QRunnable, QObject
 from PyQt6.QtGui import QPixmap, QImage
-import threading
 from typing import Type, Callable
+
+import src.utils as utils
 
 from .data_classes import PageKey, UIConstants as UIC
 from src.connectors import CaseStore

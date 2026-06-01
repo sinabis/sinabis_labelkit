@@ -1,10 +1,11 @@
-import src.connectors as connectors
-from datetime import datetime as dt
 import json
 import os
 import pytest
 import time
+from datetime import datetime as dt
 from typing import Any
+
+import src.connectors as connectors
 from .helpers import normalize_doc
 
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-from typing import Any
 from PyQt6.QtCore import QPointF
+from typing import Any
 
 
 class RectData(IntEnum):

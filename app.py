@@ -1,8 +1,9 @@
+import sys
+from PyQt6.QtWidgets import QApplication
+
 from src.config import load_config
 from src.connectors import create_store
 from src.ui import MainWindow, InitializationException
-from PyQt6.QtWidgets import QApplication
-import sys
 
 # Load Document Store
 config = load_config()

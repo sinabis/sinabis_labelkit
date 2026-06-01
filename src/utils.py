@@ -1,14 +1,15 @@
 import hashlib
 import math
 import os
-from PyQt6.QtGui import QColor, QIcon, QPainter, QPalette, QPixmap
-from PyQt6.QtCore import QPointF, Qt
-from PyQt6.QtWidgets import QApplication, QComboBox
-from PyQt6.QtSvg import QSvgRenderer
+import shutil
 import subprocess
 import sys
-import shutil
+from PyQt6.QtCore import QPointF, Qt
+from PyQt6.QtGui import QColor, QIcon, QPainter, QPalette, QPixmap
+from PyQt6.QtSvg import QSvgRenderer
+from PyQt6.QtWidgets import QApplication, QComboBox
 from typing import Any
+
 from src.ui.data_classes import UIConstants as UIC
 
 

@@ -1,7 +1,7 @@
 import math
-from PyQt6.QtWidgets import QComboBox, QGraphicsItemGroup, QGraphicsLineItem, QGraphicsRectItem, QStyleOptionGraphicsItem, QWidget, QGraphicsItem
 from PyQt6.QtCore import QLineF, QPointF, QRectF, Qt
 from PyQt6.QtGui import QBrush, QPen, QPolygonF, QColor, QMouseEvent, QPainter
+from PyQt6.QtWidgets import QComboBox, QGraphicsItemGroup, QGraphicsLineItem, QGraphicsRectItem, QStyleOptionGraphicsItem, QWidget, QGraphicsItem
 
 from .data_classes import LineOperation, UIConstants as UIC
 

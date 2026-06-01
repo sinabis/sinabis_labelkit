@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import model_validator, BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
 

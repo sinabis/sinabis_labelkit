@@ -1,11 +1,10 @@
-from .data_classes import RectData, UIConstants as UIC
-
 import abc
 import numpy as np
-
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsRectItem
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QTransform
+from PyQt6.QtWidgets import QGraphicsView, QGraphicsRectItem
+
+from .data_classes import RectData, UIConstants as UIC
 
 
 
