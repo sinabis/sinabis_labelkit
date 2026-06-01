@@ -159,7 +159,7 @@ class ResolveCasePathDialog(QDialog):
     def _perform_file_check(self) -> bool:
         self._progress_msg.setPlainText("Checking Files ...")
         docs = self._store.find(cases = [self._case])
-        self._progress_bar.setMaximum(len(docs) - 1)
+        self._progress_bar.setMaximum(len(docs))
         valid = True
         for i, doc in enumerate(docs):
             abs_path = os.path.join(self._path, doc['path'])
