@@ -1,13 +1,13 @@
 import os
 import pdf2image
-from pdf2image.exceptions import PDFPageCountError
-from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QGridLayout, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QVBoxLayout, QWidget
-from PyQt6.QtCore import pyqtSlot, pyqtSignal, QObject, QRunnable, QThreadPool, QTimer
 import re
+from pdf2image.exceptions import PDFPageCountError
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, QObject, QRunnable, QThreadPool, QTimer
+from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QGridLayout, QLabel, QLineEdit, QPlainTextEdit, QProgressBar, QPushButton, QVBoxLayout, QWidget
 from typing import Callable
 
-from ..connectors import DocumentStore
 from .. import utils
+from ..connectors import DocumentStore
 from .data_loading import FileLoader
 
 VALID_DB_STRING_REGEX   = r"^[a-z0-9_-ßöüä]+$"
@@ -116,7 +116,7 @@ class ResolveCasePathDialog(QDialog):
 
         # = Layout =
         grid_layout     = QGridLayout()
-        grid_layout.addWidget(QLabel("Select Root Directory for Case '{}'".format(case).format()), 0, 0, 1, 2)
+        grid_layout.addWidget(QLabel("Select Root Directory for Case '{}'".format(case)), 0, 0, 1, 2)
         grid_layout.addWidget(self._path_edit, 1, 0)
         grid_layout.addWidget(self._browse_button, 1, 1)
         grid_layout.addWidget(self._dir_errors, 2, 0, 1, 2)
@@ -159,7 +159,7 @@ class ResolveCasePathDialog(QDialog):
     def _perform_file_check(self) -> bool:
         self._progress_msg.setPlainText("Checking Files ...")
         docs = self._store.find(cases = [self._case])
-        self._progress_bar.setMaximum(len(docs) - 1)
+        self._progress_bar.setMaximum(len(docs))
         valid = True
         for i, doc in enumerate(docs):
             abs_path = os.path.join(self._path, doc['path'])
@@ -167,7 +167,7 @@ class ResolveCasePathDialog(QDialog):
                 valid = False
                 self._progress_msg.appendPlainText("File '{}' does not exist!".format(doc['path']))
             self._progress_bar.setValue(i)
-        
+
         if valid:
             self._progress_msg.appendPlainText("All Files found")
 
@@ -176,7 +176,7 @@ class ResolveCasePathDialog(QDialog):
 
 
 class WorkerThread(QRunnable):
-    
+
     def __init__(self, job_callback: Callable[[], None], on_exception: Callable[[Exception], None], on_success: Callable[[], None]):
         """
         A runnable class to execute a job callback, which might last a long time, in a thread, so that the UI never freezes.
@@ -587,7 +587,7 @@ class CreateCaseDialog(QDialog):
         """
         if self._case_root is None or self._case_name is None:
             return
-        
+
         files = utils.ls_rec(self._case_root)
         self._progress_bar.setMaximum(len(files))
         unknown_extensions = set()
@@ -668,4 +668,3 @@ class CreateCaseDialog(QDialog):
 
         self._check_button_states()
         self._case_root = case_root
-    

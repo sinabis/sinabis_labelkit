@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from collections.abc import Iterator, ItemsView, KeysView, ValuesView
 from src.config import AppSettings
 
@@ -13,7 +13,7 @@ class CaseNotFoundException(Exception):
 class CaseStore:
     """
     A case store bridges the gap between relative file paths stored in a central Document Store and the location of referenced files within a local file system.
-    If a shared file system is used, paths may be similar for each member. 
+    If a shared file system is used, paths may be similar for each member.
     When a database is shared, but each member has a local copy of the referenced files, the case root directories may vary for each member.
     When creating new cases, the according root directories are stored in the working directory as a JSON file.
     """
@@ -48,11 +48,12 @@ class CaseStore:
 
     def __delitem__(self, case: str):
         del self._case_to_path[case]
+        self._write_case_file()
 
 
     def __len__(self) -> int:
         return len(self._case_to_path)
-    
+
 
     def _write_case_file(self):
         with open(self._case_root_file, 'w') as f:

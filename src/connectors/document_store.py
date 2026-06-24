@@ -1,12 +1,12 @@
-from .case_store import CaseStore
-
-from abc import ABC, abstractmethod
 import datetime as dt
-from collections import defaultdict
 import json
 import os
 import tqdm
+from abc import ABC, abstractmethod
+from collections import defaultdict
 from typing import Any
+
+from .case_store import CaseStore
 
 
 
@@ -16,32 +16,51 @@ class _NO_DOCTYPE:
 NO_DOCTYPE = _NO_DOCTYPE()
 
 
+
 class CaseNotFoundException(Exception):
     pass
+
+
 
 class DuplicateException(Exception):
     pass
 
+
+
 class EmptyUpdateException(Exception):
     pass
+
+
 
 class IdentifierNotFoundException(Exception):
     pass
 
+
+
 class InvalidIdentifierException(Exception):
     pass
+
+
 
 class InvalidPageIntervalException(Exception):
     pass
 
+
+
 class InvalidPageNumberException(Exception):
     pass
+
+
 
 class UniquePageToDocumentAssignmentException(Exception):
     pass
 
+
+
 class ExportException(Exception):
     pass
+
+
 
 class ImportException(Exception):
     pass
@@ -57,7 +76,7 @@ class DocumentStore(ABC):
     @abstractmethod
     def insert(self,
             case:       str,
-            path:       str, 
+            path:       str,
             pages:      int | list[int],
             identifier: int | None              = None,
             doctypes:   str | list[str] | None  = None,
@@ -99,8 +118,8 @@ class DocumentStore(ABC):
     @abstractmethod
     def find_documents_in_page_range(self,
             case:       str,
-            path:       str, 
-            page_min:   int, 
+            path:       str,
+            page_min:   int,
             page_max:   int
         ) -> list[dict[str, Any]]:
         """Find docs where ANY page is in [page_min, page_max] (overlapping)"""
@@ -126,7 +145,7 @@ class DocumentStore(ABC):
     def identifiers(self) -> list[int]:
         """Returns a list of all document identifiers"""
         raise NotImplementedError
-    
+
 
     @abstractmethod
     def cases(self) -> list[str]:
@@ -153,7 +172,7 @@ class DocumentStore(ABC):
         Returns:
             A list of cases with missing paths
         """
-        invalid = [] 
+        invalid = []
         for case in self.cases():
            if not case in self._case_store or not os.path.exists(self._case_store[case]):
                invalid.append(case)
@@ -183,19 +202,19 @@ class DocumentStore(ABC):
 
         if not isinstance(file_path, str) or not file_path.endswith('json'):
             raise ExportException("File path '{}' is not a JSON file!".format(file_path))
-        
+
         base_dir, file_name = os.path.split(file_path)
         if os.path.exists(file_path):
             os.remove(file_path)
         elif base_dir and not os.path.exists(base_dir):
             os.makedirs(base_dir)
-        
+
         doc_data = self.find()
         for doc in doc_data:
             del doc['created_at']
             del doc['updated_at']
             del doc['identifier']
-        
+
         case_data = {k: v for (k, v) in self._case_store.items()}
 
         export_data = {'documents':  doc_data, 'cases': case_data}
@@ -206,13 +225,13 @@ class DocumentStore(ABC):
     def import_documents(self, file_path: str):
         """
         Loads a document store from a json file. Note that IDs are not part of the import data.
-        
+
         Args:
             file_path:  A .json file containing the documents to load
         """
         if not os.path.exists(file_path):
             raise ImportException("File '{}' does not exist!".format(file_path))
-        
+
         with open(file_path, 'r', encoding = 'utf-8') as f:
             import_data = json.load(f)
 

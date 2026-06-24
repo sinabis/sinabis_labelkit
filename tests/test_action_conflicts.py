@@ -1,7 +1,8 @@
+import pytest
 from typing import Any
+
 import src.actions as actions
 import src.connectors as connectors
-import pytest
 from .helpers import normalize_doc
 
 
@@ -54,7 +55,7 @@ def action_manager_2() -> actions.ActionManager:
 
 
 class Test_Non_Existing_ID_Do:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:
@@ -99,7 +100,7 @@ class Test_Non_Existing_ID_Do:
 
 
 class Test_Non_Existing_ID_Undo:
-    
+
     @pytest.fixture(autouse = True)
     def setup(self, store, initial_test_docs):
         for doc in initial_test_docs:

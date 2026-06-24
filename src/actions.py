@@ -1,19 +1,23 @@
 from abc import ABC
-from .connectors import DocumentStore, InvalidIdentifierException, IdentifierNotFoundException, NO_DOCTYPE, _NO_DOCTYPE
 from collections import deque
 from PyQt6.QtCore import pyqtSignal, QObject
+
+from .connectors import DocumentStore, InvalidIdentifierException, IdentifierNotFoundException, NO_DOCTYPE, _NO_DOCTYPE
 
 
 
 DOCUMENT_INSERTION_KEYS = ['identifier', 'case', 'path', 'pages', 'doctypes', 'junk']
 
 
+
 class MergeException(Exception):
     pass
 
 
+
 class SplitException(Exception):
     pass
+
 
 
 class ClusterException(Exception):
@@ -26,15 +30,18 @@ class Action(ABC):
     def do(self):
         raise NotImplementedError
 
+
     def undo(self):
         raise NotImplementedError
-    
+
+
     def redo(self):
         raise NotImplementedError
-    
+
+
     def __repr__(self) -> str:
         raise NotImplementedError
-    
+
 
 
 class DeleteAction(Action):
@@ -185,16 +192,16 @@ class ClusterAction(Action):
     def do(self, new_doc_ids: list[int] | None = None):
         if not (doc := self._store.find(identifier = self._doc_id)):
             raise IdentifierNotFoundException("Document with ID '{}' not found!".format(self._doc_id))
-        
+
         self._prev_doc  = {k:v for k, v in doc[0].items() if k in DOCUMENT_INSERTION_KEYS}
-        
+
         range_before    = list(filter(lambda x: x < min(self._page_numbers), self._prev_doc['pages']))
         range_mid       = sorted(self._page_numbers)
         range_after     = list(filter(lambda x: x > max(self._page_numbers), self._prev_doc['pages']))
 
         if not new_doc_ids:
             new_docs = deque([None, None, None])
-        else:       
+        else:
             new_docs = deque(new_doc_ids[::-1])
 
         # Delete original documents
@@ -234,7 +241,7 @@ class ClusterAction(Action):
 
     def __repr__(self) -> str:
         return "Clustering Pages '{}' of ID '{}'".format(self._page_numbers, self._doc_id)
-    
+
 
 
 class MergeAction(Action):
@@ -260,7 +267,7 @@ class MergeAction(Action):
             raise IdentifierNotFoundException("Document with ID '{}' not found!".format(self._doc_id_1))
         if not (doc_2 := self._store.find(identifier = self._doc_id_2)):
             raise IdentifierNotFoundException("Document with ID '{}' not found!".format(self._doc_id_2))
-        
+
         self._prev_doc_1  = {k:v for k, v in doc_1[0].items() if k in DOCUMENT_INSERTION_KEYS}
         self._prev_doc_2  = {k:v for k, v in doc_2[0].items() if k in DOCUMENT_INSERTION_KEYS}
 
@@ -283,7 +290,7 @@ class MergeAction(Action):
             junk        = self._prev_doc_1['junk']
         )
 
-    
+
     def undo(self):
         if not self._store.find(identifier = self._created_id):
             raise IdentifierNotFoundException("Document with ID '{}' not found!".format(self._created_id))
@@ -301,7 +308,7 @@ class MergeAction(Action):
 
 
     def __repr__(self) -> str:
-        return "Merging Documents '{}' and '{}'".format(self._doc_id_1, self._doc_id_1)
+        return "Merging Documents '{}' and '{}'".format(self._doc_id_1, self._doc_id_2)
 
 
 
@@ -333,7 +340,7 @@ class SplitAction(Action):
         pages_after     = sorted(filter(lambda x: x > self._split_after, self._prev_doc['pages']))
         if min(len(pages_before), len(pages_after)) == 0:
             raise SplitException("Invalid split index '{}' for document pages '{}'".format(self._split_after, self._prev_doc['pages']))
-        
+
         # Delete original documents
         self._store.delete(identifier = self._doc_id)
 
@@ -344,7 +351,7 @@ class SplitAction(Action):
         self._created_ids   = []
         for id_, pages in zip(new_doc_ids, [pages_before, pages_after]):
             created_id  = self._store.insert(
-                identifier  = id_, 
+                identifier  = id_,
                 case        = self._prev_doc['case'],
                 path        = self._prev_doc['path'],
                 pages       = pages,
@@ -352,7 +359,7 @@ class SplitAction(Action):
                 junk        = self._prev_doc['junk']
             )
             self._created_ids.append(created_id)
-    
+
 
     def undo(self):
         for _id in self._created_ids:
@@ -383,7 +390,7 @@ class ActionManager(QObject):
     do_triggered                = pyqtSignal(Action)
     undo_triggered              = pyqtSignal(Action)
     redo_triggered              = pyqtSignal(Action)
-    
+
 
     @property
     def undo_chain_length(self) -> int:
@@ -447,6 +454,6 @@ class ActionManager(QObject):
             action.redo()
             self._history.append(action)
             self.redo_triggered.emit(action)
-       
+
         self.undo_chain_length_changed.emit(len(self._history))
         self.redo_chain_length_changed.emit(len(self._undo_stack))

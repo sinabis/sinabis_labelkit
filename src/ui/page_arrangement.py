@@ -1,16 +1,14 @@
-from .data_classes import RectData, UIConstants as UIC
-
 import abc
 import numpy as np
-
-from PyQt6.QtWidgets import QGraphicsView, QGraphicsRectItem
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QTransform
+from PyQt6.QtWidgets import QGraphicsView, QGraphicsRectItem
+
+from .data_classes import RectData, UIConstants as UIC
 
 
 
 class AbstractPageArrangement(abc.ABC):
-
 
     def __init__(self, view: QGraphicsView, transform: QTransform | None = None):
         """
@@ -19,7 +17,7 @@ class AbstractPageArrangement(abc.ABC):
         Args:
             view:       The view to manage
             transform:  A default scene transformation, i.e. to provide a default zoom level
-        """        
+        """
         if not transform:
             transform = QTransform()
 
@@ -123,7 +121,7 @@ class PagewiseArrangement(AbstractPageArrangement):
     def allow_vertical_scrolling(self) -> bool:
         return True
 
-            
+
 
 class DocumentwiseArrangement(AbstractPageArrangement):
 
@@ -158,7 +156,7 @@ class DocumentwiseArrangement(AbstractPageArrangement):
                     x_offset = 0
                     y_offset += UIC.page_rect_height + UIC.gap_between_documents
                 rect.setPos(x_offset, y_offset)
-            
+
             # Case 3: New Document
             else:
                 if (x_offset := x_offset + UIC.gap_between_documents + UIC.page_rect_width) > max_x:
@@ -203,7 +201,7 @@ class LabelingArrangement(AbstractPageArrangement):
             rect.setPos(x_offset, 0)
             x_offset += UIC.page_rect_width + UIC.gap_between_pages
 
-    
+
     def allow_horizontal_scrolling(self) -> bool:
         return True
 

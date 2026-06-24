@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import model_validator, BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
 
@@ -28,12 +28,12 @@ class AppSettings(BaseSettings):
         case_sensitive      = False,
         extra               = "ignore",
     )
-    
+
 
     @model_validator(mode = "before")
     @classmethod
     def load_nested_configs(cls, data: dict) -> dict:
-        
+
         prefix_to_backend = {'psql': 'db_psql_', 'mdb': 'db_mdb_'}
         for backend, prefix in prefix_to_backend.items():
             data[backend] = DatabaseConfig(

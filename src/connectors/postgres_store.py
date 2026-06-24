@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from .document_store import _NO_DOCTYPE, NO_DOCTYPE, CaseNotFoundException, DocumentStore, EmptyUpdateException, DuplicateException, IdentifierNotFoundException, InvalidIdentifierException, InvalidPageNumberException, InvalidPageIntervalException, UniquePageToDocumentAssignmentException
-
 import datetime as dt
-from src.config import DatabaseConfig
 from sqlalchemy import create_engine, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, delete, exists, select, text, or_, case as case_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, relationship, sessionmaker, Session
 from sqlalchemy.sql import func
-from sqlalchemy.exc import IntegrityError
 from typing import Any
+
+from .document_store import _NO_DOCTYPE, NO_DOCTYPE, CaseNotFoundException, DocumentStore, EmptyUpdateException, DuplicateException, IdentifierNotFoundException, InvalidIdentifierException, InvalidPageNumberException, InvalidPageIntervalException, UniquePageToDocumentAssignmentException
+from src.config import DatabaseConfig
 
 
 
@@ -46,7 +46,7 @@ class File(Base):
     __table_args__          = (UniqueConstraint('case_id', 'path', name = 'uq_file_case_path'),)
 
     # many-to-one: File → Case
-    case: Mapped[Case]      = relationship(back_populates="files")
+    case: Mapped[Case]      = relationship(back_populates = "files")
 
     # one-to-many: File → Page
     pages: Mapped[list[Page]] = relationship(
@@ -132,10 +132,8 @@ class PageAssignment(Base):
 
 
 
-
-
-
 class PostgresStore(DocumentStore):
+
     def __init__(self, config: DatabaseConfig):
         super().__init__()
         self._config    = config
@@ -159,7 +157,7 @@ class PostgresStore(DocumentStore):
             if not session.query(IdCounter).scalar():
                 session.add(IdCounter(id = 0))
                 session.commit()
-          
+
 
     def _create_database(self):
         # Connect to the default 'postgres' DB as postgres user
@@ -176,7 +174,7 @@ class PostgresStore(DocumentStore):
 
     def insert(self,
             case:       str,
-            path:       str, 
+            path:       str,
             pages:      int | list[int],
             identifier: int | None              = None,
             doctypes:   str | list[str] | None  = None,
@@ -192,7 +190,7 @@ class PostgresStore(DocumentStore):
             raise InvalidPageNumberException("Page number '{}' is invalid!".format(pages))
 
         if doctypes is None:
-            doctypes    = [] 
+            doctypes    = []
         elif isinstance(doctypes, str):
             doctypes    = [doctypes]
 
@@ -267,7 +265,6 @@ class PostgresStore(DocumentStore):
 
         # Return the document ID (as string for external APIs)
         return doc_id
-    
 
 
     def update(self,
@@ -297,7 +294,7 @@ class PostgresStore(DocumentStore):
             raise InvalidPageNumberException("Page number '{}' is invalid!".format(pages))
 
         with self.SessionLocal() as session:
-            
+
             # Check if Document-ID exists
             found = session.execute(select(Document).where(Document.id == identifier)).scalar()
             if found is None:
@@ -332,8 +329,8 @@ class PostgresStore(DocumentStore):
                         page = Page(file_id = target_file.id, number = number)
                         session.add(page)
                         session.flush()
-                    pages_to_reassign.append(page.id)                
-                    
+                    pages_to_reassign.append(page.id)
+
             # If path changed but pages didn't, move pages to new file
             elif path is not None:
                 pages_to_move = session.execute(select(Page).join(PageAssignment).where(PageAssignment.document_id == identifier)).scalars()
@@ -378,7 +375,6 @@ class PostgresStore(DocumentStore):
         return True
 
 
-            
     def find(self,
             identifier:     int | None                                          = None,
             path:           str | None                                          = None,
@@ -477,20 +473,20 @@ class PostgresStore(DocumentStore):
             "doctypes":     r.doctypes if r.doctypes != [None] else [],
             "junk":         r.junk
             } for r in rows]
-        
+
         return sorted(formated, key = lambda x: (x['case'], x['path'], min(x['pages'])))
 
 
     def find_documents_in_page_range(self,
             case:       str,
-            path:       str, 
-            page_min:   int, 
+            path:       str,
+            page_min:   int,
             page_max:   int
         ) -> list[dict[str, Any]]:
-        
+
         if page_min > page_max or min(page_min, page_max) < 0:
             raise InvalidPageIntervalException("[{}, {}] is an invalid Interval!".format(page_min, page_max))
-        
+
         # Find identifiers of matching documents
         filtered_docs = (
             select(Document.id)
@@ -539,9 +535,9 @@ class PostgresStore(DocumentStore):
             "doctypes":     r.doctypes if r.doctypes != [None] else [],
             "junk":         r.junk
             } for r in rows]
-        
+
         return sorted(formated, key = lambda x: (x['case'], x['path'], min(x['pages'])))
-    
+
 
     def delete(self,
             identifier: int | None  = None,
@@ -560,14 +556,14 @@ class PostgresStore(DocumentStore):
                 if identifier is not None:
                     if not isinstance(identifier, int):
                         raise InvalidIdentifierException("Identifier '{}' is invalid!".format(identifier))
-                    
+
                     # Delete document
                     doc = session.get(Document, identifier)
                     if doc:
                         session.delete(doc)
                     else:
                         raise IdentifierNotFoundException("ID '{}' not found!".format(identifier))
-                    
+
                     # Delete doctype if orphaned
                     orphan_stmt     = select(Doctype).where(~exists().where(DoctypeAssignment.doctype_id == Doctype.id))
                     orphan_doctypes = session.execute(orphan_stmt).scalars().all()
@@ -644,7 +640,7 @@ class PostgresStore(DocumentStore):
 
         Args:
             session: The current session
-        
+
         Returns:
             The incremented ID
         """
@@ -657,7 +653,7 @@ class PostgresStore(DocumentStore):
     def _highest_id(self, session: Session) -> int:
         """
         Returns the highest known ID.
-        
+
         Args:
             session: The current session.
 
@@ -665,7 +661,7 @@ class PostgresStore(DocumentStore):
             The highest ID
         """
         return session.query(IdCounter).with_for_update().one().max_id
-    
+
 
     def _update_highest_id(self, session: Session, identifier: int):
         """

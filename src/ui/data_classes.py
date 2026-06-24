@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-from typing import Any
 from PyQt6.QtCore import QPointF
+from typing import Any
+
 
 
 class RectData(IntEnum):
@@ -13,10 +14,12 @@ class RectData(IntEnum):
     JUNK        = 5
 
 
+
 class ArrangementType(Enum):
     PAGE        = 0
     DOCUMENT    = 1
     LABELING    = 2
+
 
 
 class LineOperation(Enum):
@@ -26,10 +29,12 @@ class LineOperation(Enum):
     MERGE       = 3
 
 
+
 @dataclass(frozen = True)
 class MagnetLink:
     source_pos:     QPointF
     target_pos:     QPointF
+
 
 
 @dataclass(frozen = True)
@@ -43,6 +48,7 @@ class ClusterMagnetLink(MagnetLink):
         return LineOperation.CLUSTER
 
 
+
 @dataclass(frozen = True)
 class MergeMagnetLink(MagnetLink):
     doc_id_1:       Any
@@ -51,6 +57,7 @@ class MergeMagnetLink(MagnetLink):
     @property
     def operation(self) -> LineOperation:
         return LineOperation.MERGE
+
 
 
 @dataclass(frozen = True)
@@ -70,6 +77,7 @@ class CacheKey:
     page_number:    int
 
 
+
 @dataclass(frozen = True)
 class PageKey:
     doc_id:         Any
@@ -79,9 +87,10 @@ class PageKey:
     dpi:            int
 
 
+
 @dataclass(frozen = True)
 class UIConstants:
-    
+
     # General
     epsilon:                float       = 0.0001
 
@@ -106,7 +115,7 @@ class UIConstants:
     page_arrangement_scale: float       = 300
     doc_arrangement_scale:  float       = 300
     lab_arrangement_scale:  float       = 1400
-    gap_between_pages:      float       = 0.02 
+    gap_between_pages:      float       = 0.02
     gap_between_documents:  float       = 0.2
     page_rect_width:        float       = 0.6
     page_rect_height:       float       = 1.0   # 1.0 ~ Screen Height

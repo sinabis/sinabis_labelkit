@@ -1,6 +1,7 @@
-from src.config import load_config
 import pytest
+
 import src.connectors as connectors
+from src.config import load_config
 
 
 # Check which backends to test

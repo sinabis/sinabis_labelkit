@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
-import src.utils as utils
+import threading
 from pdf2image import convert_from_path
 from PIL import Image
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QRunnable, QObject
 from PyQt6.QtGui import QPixmap, QImage
-import threading
 from typing import Type, Callable
+
+import src.utils as utils
 
 from .data_classes import PageKey, UIConstants as UIC
 from src.connectors import CaseStore
@@ -22,6 +23,7 @@ class Signals(QObject):
 class FileLoader(QRunnable):
 
     _registry: dict[str, Type[FileLoader]] = {}
+
 
     def __init__(self, key: PageKey, case_store: CaseStore, loaded_callback: Callable[[PageKey, QPixmap], None]):
         super().__init__()
@@ -84,8 +86,9 @@ class FileLoader(QRunnable):
         self._deprecated.set()
 
 
+
 @FileLoader.register_loader('.pdf')
-class PdfLoader(FileLoader):    
+class PdfLoader(FileLoader):
 
     @pyqtSlot()
     def run(self):
@@ -106,8 +109,17 @@ class PdfLoader(FileLoader):
 
 
 @FileLoader.register_loader('.png')
+
+
+
 @FileLoader.register_loader('.jpg')
+
+
+
 @FileLoader.register_loader('.jpeg')
+
+
+
 @FileLoader.register_loader('.bmp')
 class ImageLoader(FileLoader):
 
