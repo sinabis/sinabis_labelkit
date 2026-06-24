@@ -68,6 +68,7 @@ def _create_page_item(
     fade_out_anim.setDuration(UIC.fade_out_duration)
     fade_out_anim.setStartValue(1.0)
     fade_out_anim.setEndValue(0.0)
+    fade_out_anim.finished.connect(lambda: pixmap_item.setPixmap(pixmap))
     pixmap_item.fade_out = fade_out_anim
 
     rect.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
@@ -560,8 +561,6 @@ class PageCanvas(QGraphicsView):
             for page_key in self._connected_pixmaps:
                 rect = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
                 for child in rect.childItems():
-                    child.fade_out.finished.disconnect()
-                    child.fade_out.finished.connect(lambda c = child: c.setPixmap(self._empty_pixmap))
                     child.fade_out.start()
             self._connected_pixmaps.clear()
             return
