@@ -660,7 +660,7 @@ class PageCanvas(QGraphicsView):
         super().resizeEvent(event)
 
 
-    def scale(self, factor: float):
+    def zoom_by(self, factor: float):
 
         # Anchor point in scene center
         if self._arrangement_type == ArrangementType.LABELING:
@@ -685,7 +685,7 @@ class PageCanvas(QGraphicsView):
         # Wheel + CTRL -> Zoom
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             factor = UIC.zoom_step_factor if event.angleDelta().y() > 0 else 1 / UIC.zoom_step_factor
-            self.scale(factor)
+            self.zoom_by(factor)
             return
 
         # (Pagewise) Horizontal / Vertical Scrolling
@@ -1296,13 +1296,13 @@ class MainWindow(QMainWindow):
         zoom_out_action.setShortcut("Ctrl+-")
         zoom_out_action.setToolTip("Zoom out (Ctrl+Minus)")
         zoom_out_action.setIcon(utils.load_icon(UIC.icon_zoom_out))
-        zoom_out_action.triggered.connect(lambda x: self._canvas.scale(1 / UIC.zoom_step_factor))
+        zoom_out_action.triggered.connect(lambda x: self._canvas.zoom_by(1 / UIC.zoom_step_factor))
         menu_tool_bar.addAction(zoom_out_action)
         zoom_in_action  = QAction(self)
         zoom_in_action.setShortcut("Ctrl++")
         zoom_in_action.setToolTip("Zoom in (Ctrl+Plus)")
         zoom_in_action.setIcon(utils.load_icon(UIC.icon_zoom_in))
-        zoom_in_action.triggered.connect(lambda x: self._canvas.scale(UIC.zoom_step_factor))
+        zoom_in_action.triggered.connect(lambda x: self._canvas.zoom_by(UIC.zoom_step_factor))
         menu_tool_bar.addAction(zoom_in_action)
 
         # Update
