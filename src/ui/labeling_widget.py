@@ -233,7 +233,7 @@ class PageCanvas(QGraphicsView):
         """
         Returns the document which is currently selected.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             return self._doc_id_to_doc[self._selected_doc_id]
         else:
             return None
@@ -271,7 +271,7 @@ class PageCanvas(QGraphicsView):
         self._reset_selection()
 
         # Select pages (if a different document was selected than before)
-        if doc_id and not unselect:
+        if doc_id is not None and not unselect:
             self._apply_selection(doc_id)
 
         self.selection_changed.emit(self._selected_doc_id)
@@ -295,7 +295,7 @@ class PageCanvas(QGraphicsView):
         self._reset_selection()
 
         # Select pages
-        if doc_id:
+        if doc_id is not None:
             self._apply_selection(doc_id)
 
         if state_changed:
@@ -308,7 +308,7 @@ class PageCanvas(QGraphicsView):
         """
         If there is a document currently selected, find, select and focus the previous document.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             first_doc_page  = self._doc_id_to_doc[self._selected_doc_id]['pages'][0]
             first_doc_index = self._page_id_to_index[(self._selected_doc_id, first_doc_page)]
             while first_doc_index > 0:
@@ -326,7 +326,7 @@ class PageCanvas(QGraphicsView):
         """
         If there is a document currently selected, find, select and focus the next document.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             last_doc_page   = self._doc_id_to_doc[self._selected_doc_id]['pages'][-1]
             last_doc_index  = self._page_id_to_index[(self._selected_doc_id, last_doc_page)]
             while last_doc_index + 1 < len(self._page_items):
