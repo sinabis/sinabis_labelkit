@@ -10,7 +10,7 @@ from .. import utils
 from ..connectors import DocumentStore
 from .data_loading import FileLoader
 
-VALID_DB_STRING_REGEX   = r"^[a-z0-9_-ßöüä]+$"
+VALID_DB_STRING_REGEX   = r"^[a-z0-9_ßöüä-]+$"
 ERROR_STYLE             = "color: red;"
 MIN_WINDOW_WIDTH        = 700
 SUCCESS_MESSAGE_MSECS   = 800
