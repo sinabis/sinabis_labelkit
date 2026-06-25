@@ -593,7 +593,7 @@ class PageCanvas(QGraphicsView):
 
         # Mark pages as deprecated that are currently waiting to be loaded, but are no longer visible
         for key in self._loading_pixmaps - visible_page_keys:
-            self._worker_jobs[key].mark_deprecated()
+            self._worker_jobs.pop(key).mark_deprecated()
             self._loading_pixmaps.remove(key)
 
         # Remove non-visible pixmaps from UI
