@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QGridLayout,
 from typing import Callable
 
 from .. import utils
-from ..connectors import DocumentStore
+from ..connectors import DocumentStore, ImportException
 from .data_loading import FileLoader
 
 VALID_DB_STRING_REGEX   = r"^[a-z0-9_ßöüä-]+$"
@@ -302,7 +302,7 @@ class ImportDialog(QDialog):
         # Resolve case roots from the document store which are missing
         for case in self._store.missing_case_paths():
             if not resolve_invalid_case_root(case):
-                raise ImportError("Could not resolve path for case '{}'!".format(case))
+                raise ImportException("Could not resolve path for case '{}'!".format(case))
 
         # Warning for missing file paths
         for (case, missing_paths) in self._store.missing_file_paths().items():
