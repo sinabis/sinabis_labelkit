@@ -101,7 +101,7 @@ class PdfLoader(FileLoader):
             abs_path    = os.path.join(case_root, self._key.path)
             doc         = convert_from_path(abs_path, first_page = self._key.page_number + 1, last_page = self._key.page_number + 1, dpi = self._key.dpi)[0]
             qpiximage   = doc.toqpixmap()
-        except:
+        except Exception:
             qpiximage   = self._load_fallback_pixmap()
 
         self._signals.loaded.emit(self._key, qpiximage)
