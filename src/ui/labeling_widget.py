@@ -71,7 +71,7 @@ def _create_page_item(
     fade_out_anim.finished.connect(lambda: pixmap_item.setPixmap(pixmap))
     pixmap_item.fade_out = fade_out_anim
 
-    rect.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
+    rect.setCacheMode(QGraphicsItem.CacheMode.NoCache)
 
     return rect
 
