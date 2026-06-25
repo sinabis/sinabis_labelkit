@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from sqlalchemy import create_engine, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, delete, exists, select, text, or_, case as case_
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, relationship, sessionmaker, Session
 from sqlalchemy.sql import func
 from typing import Any
@@ -142,7 +142,7 @@ class PostgresStore(DocumentStore):
 
         try:
             Base.metadata.create_all(self.engine)
-        except:
+        except OperationalError:
             # DATABASE DOES NOT EXIST YET -> Create it
             self._create_database()
             Base.metadata.create_all(self.engine)
