@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QApplication
 
 from src.config import load_config
 from src.connectors import create_store
-from src.ui import MainWindow, InitializationException
+from src.ui import MainWindow
 
 # Load Document Store
 config = load_config()
@@ -15,11 +15,8 @@ else:
     raise ValueError("backend must be 'postgres' or 'mongodb'")
 
 # Start Application
-try:
-    app     = QApplication(sys.argv)
-    widget  = MainWindow(store)
-    widget.setWindowTitle("Document Labeling Tool")
-    widget.showFullScreen()
-except InitializationException:
-    raise
+app     = QApplication(sys.argv)
+widget  = MainWindow(store)
+widget.setWindowTitle("Document Labeling Tool")
+widget.showFullScreen()
 app.exec()
