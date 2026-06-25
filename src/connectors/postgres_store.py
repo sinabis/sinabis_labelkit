@@ -340,11 +340,7 @@ class PostgresStore(DocumentStore):
             # Now assign new pages
             for page_id in pages_to_reassign:
                 assignment = PageAssignment(page_id = page_id, document_id = identifier)
-                try:
-                    session.add(assignment)
-                except IntegrityError:
-                    session.rollback()
-                    raise UniquePageToDocumentAssignmentException
+                session.add(assignment)
 
             # Doctype update: Delete all previous assignments; Create new doctype is necessary; Assign it
             if doctypes is not None:
