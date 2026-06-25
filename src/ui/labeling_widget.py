@@ -497,17 +497,24 @@ class PageCanvas(QGraphicsView):
             page_key:   A pageKey identifying the page + zoom level
             pixmap:     A loaded pixmap
         """
+        self._worker_jobs.pop(page_key, None)
+        self._loading_pixmaps.discard(page_key)
+
         # Already marked outdated -> Discard
         if page_key in self._removed_pixmaps:
-            self._loading_pixmaps.discard(page_key)
             self._removed_pixmaps.discard(page_key)
-            page_item   = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
-            pixmap_item = page_item.childItems()[0]
-            pixmap_item.setPixmap(self._empty_pixmap)
+            page_item   = self._page_id_to_rect.get((page_key.doc_id, page_key.page_number))
+            if page_item is not None:
+                page_item.childItems()[0].setPixmap(self._empty_pixmap)
             return
 
         # Assign pixmap to page item and play animation (if it was empty before)
-        page_item   = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
+        page_item   = self._page_id_to_rect.get((page_key.doc_id, page_key.page_number))
+
+        # Page item was deleted meanwhile
+        if page_item is None:
+            return
+
         pixmap_item = page_item.childItems()[0]
         from_empty  = pixmap_item.pixmap().isNull()
 
@@ -533,7 +540,6 @@ class PageCanvas(QGraphicsView):
         elif from_empty:
             pixmap_item.fade_in.start()
 
-        self._loading_pixmaps.discard(page_key)
         self._connected_pixmaps.add(page_key)
         cache_key = CacheKey(page_key.doc_id, page_key.page_number)
         self._pixmap_cache.add(cache_key, pixmap, page_key.dpi)
