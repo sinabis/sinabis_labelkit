@@ -564,11 +564,13 @@ class PageCanvas(QGraphicsView):
         if scale < UIC.zoom_hide_images:
             for page_key in self._loading_pixmaps:
                 self._removed_pixmaps.add(page_key)
-            for page_key in self._connected_pixmaps:
-                rect = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
-                for child in rect.childItems():
-                    child.fade_out.start()
+
+            for rect in self._page_items:
+                pixmap_item = rect.childItems()[0]
+                if not pixmap_item.pixmap().isNull():
+                    pixmap_item.fade_out.start()
             self._connected_pixmaps.clear()
+
             return
 
         # Get required DPI level based on current scene scale
