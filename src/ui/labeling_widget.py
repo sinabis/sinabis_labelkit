@@ -912,10 +912,6 @@ class PageCanvas(QGraphicsView):
 
             self._closest_magnet    = None
 
-        # Right Button ->
-        elif event.button() == Qt.MouseButton.RightButton:
-            pass
-
         # Middle Button -> Translation Stop
         elif event.button() == Qt.MouseButton.MiddleButton:
             self._translation_start = None
