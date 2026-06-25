@@ -127,7 +127,7 @@ class DocumentwiseArrangement(AbstractPageArrangement):
 
     def __init__(self, view: QGraphicsView):
         """
-        Arranges the pages on the canvas so that pagges assigned to the same document are clustered spatially.
+        Arranges the pages on the canvas so that pages assigned to the same document are clustered spatially.
 
         Args:
             view: The QGraphicsView holding the items

@@ -32,7 +32,7 @@ def _create_page_item(
         pixmap:           QPixmap,
     ) -> QGraphicsRectItem:
     """
-    A method to create a QGraphicsRectItem with a child widget QGraphicsPixmapItem, whoch is assigned a pixmap (can be empty).
+    A method to create a QGraphicsRectItem with a child widget QGraphicsPixmapItem, which is assigned a pixmap (can be empty).
     Note that QGraphicsRectItem position is still at the origin and QGraphicsPixmapItem pixmap is still empty.
 
     Args:
@@ -353,7 +353,7 @@ class PageCanvas(QGraphicsView):
         """
         Creates page-wise QRectItems, attaches data and adds them to scene and buffer. Rectangles are buffered, so that only new ones need to be added to the scene.
         """
-        # Mark loading pixmaps as depricated; disconnect loaded pixmaps;
+        # Mark loading pixmaps as deprecated; disconnect loaded pixmaps;
         # TODO: optimize
         for key in self._loading_pixmaps:
             self._removed_pixmaps.add(key)

@@ -318,7 +318,7 @@ class PostgresStore(DocumentStore):
             else:
                 target_file = cur_file
 
-            # Pages update: Remove old assignments; get existing pages (path + number (+ case implicitely)), create it otherwise
+            # Pages update: Remove old assignments; get existing pages (path + number (+ case implicitly)), create it otherwise
             # Note: Pages are not re-assigned directly, due to a possible restructuring
             pages_to_reassign = []
             if pages is not None:

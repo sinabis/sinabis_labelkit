@@ -94,7 +94,7 @@ class DocumentStore(ABC):
             doctypes:   str | list[str] | _NO_DOCTYPE | None    = None,
             junk:       bool | None                             = None
         ) -> bool:
-        """Insert or update a document. Returns if successfull."""
+        """Insert or update a document. Returns if successful."""
         raise NotImplementedError
 
 
