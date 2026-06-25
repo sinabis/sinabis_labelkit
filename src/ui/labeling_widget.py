@@ -262,7 +262,7 @@ class PageCanvas(QGraphicsView):
         Args:
             doc_id: The identifier to select or deselect, or None
         """
-        if doc_id == self._selected_doc_id == None:
+        if doc_id is None and self._selected_doc_id is None:
             return
 
         unselect = self._selected_doc_id == doc_id
@@ -431,7 +431,7 @@ class PageCanvas(QGraphicsView):
         self.update_page_arrangement()
 
         # If selected ID still exists and is not filtered -> Highlight, otherwise -> reset selection
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             if self._selected_doc_id in self._doc_id_to_doc and self._satisfies_all_filters(self._doc_id_to_doc[self._selected_doc_id]):
                 first_page  = self._doc_id_to_doc[self._selected_doc_id]['pages'][0]
                 page_id     = (self._selected_doc_id, first_page)
@@ -447,7 +447,7 @@ class PageCanvas(QGraphicsView):
         """
         Reset highlighting for currently selected UI items.
         """
-        if self._selected_doc_id and self._selected_doc_id in self._doc_id_to_rects:
+        if self._selected_doc_id is not None and self._selected_doc_id in self._doc_id_to_rects:
             for rect in self._doc_id_to_rects[self._selected_doc_id]:
                 rect.setPen(QPen(Qt.PenStyle.NoPen))
         self._selected_doc_id = None
