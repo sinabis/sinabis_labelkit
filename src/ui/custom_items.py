@@ -25,6 +25,9 @@ class MultiColorRectItem(QGraphicsRectItem):
 
     def paint(self, painter: QPainter, options: QStyleOptionGraphicsItem, widget: QWidget | None = None):
 
+        # Save painter state (the view uses DontSavePainterState, so items must restore it themselves)
+        painter.save()
+
         # Get base rect
         rect    = self.rect()
         w, h    = rect.width(), rect.height()
@@ -37,6 +40,8 @@ class MultiColorRectItem(QGraphicsRectItem):
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawRect(rect)
+
+        painter.restore()
 
 
 
@@ -60,6 +65,9 @@ class StripedColorRectItem(QGraphicsRectItem):
 
 
     def paint(self, painter: QPainter, options: QStyleOptionGraphicsItem, widget: QWidget | None = None):
+
+        # Save painter state (the view uses DontSavePainterState, so items must restore it themselves)
+        painter.save()
 
         # Get base rect
         rect    = self.rect()
@@ -92,13 +100,15 @@ class StripedColorRectItem(QGraphicsRectItem):
         painter.setBrush(self.brush())
         painter.drawRect(rect)
 
+        painter.restore()
+
 
 
 class ContrastLineItem(QGraphicsItemGroup):
 
     def __init__(self, p1: QPointF, p2: QPointF, operation: LineOperation = LineOperation.INVALID, parent: QGraphicsItem | None = None):
         """
-        A class to provide a line with a larger one behind it with a constrastive background color. Inteded to distinguish the line better over varying background items.
+        A class to provide a line with a larger one behind it with a contrastive background color. Intended to distinguish the line better over varying background items.
 
         Args:
             p1:         Coordinates of the point point
@@ -190,7 +200,7 @@ class FoldableComboBox(QComboBox):
 
     def __init__(self):
         """
-        For some reason the popup behavior of regular combo boxes only allows item selection while the mouse button is pressed, and cloeses the popup once the button is released.
+        For some reason the popup behavior of regular combo boxes only allows item selection while the mouse button is pressed, and closes the popup once the button is released.
         This class changes this behavior and opens the popup once a mouse button was released.
         """
         super().__init__()

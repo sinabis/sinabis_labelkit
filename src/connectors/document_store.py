@@ -94,7 +94,7 @@ class DocumentStore(ABC):
             doctypes:   str | list[str] | _NO_DOCTYPE | None    = None,
             junk:       bool | None                             = None
         ) -> bool:
-        """Insert or update a document. Returns if successfull."""
+        """Insert or update a document. Returns if successful."""
         raise NotImplementedError
 
 
@@ -174,8 +174,8 @@ class DocumentStore(ABC):
         """
         invalid = []
         for case in self.cases():
-           if not case in self._case_store or not os.path.exists(self._case_store[case]):
-               invalid.append(case)
+            if not case in self._case_store or not os.path.exists(self._case_store[case]):
+                invalid.append(case)
         return invalid
 
 
@@ -200,7 +200,7 @@ class DocumentStore(ABC):
             file_path:  A .json file path which is overriden when it already exists
         """
 
-        if not isinstance(file_path, str) or not file_path.endswith('json'):
+        if not isinstance(file_path, str) or not file_path.endswith('.json'):
             raise ExportException("File path '{}' is not a JSON file!".format(file_path))
 
         base_dir, file_name = os.path.split(file_path)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from sqlalchemy import create_engine, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, delete, exists, select, text, or_, case as case_
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase, relationship, sessionmaker, Session
 from sqlalchemy.sql import func
 from typing import Any
@@ -142,7 +142,7 @@ class PostgresStore(DocumentStore):
 
         try:
             Base.metadata.create_all(self.engine)
-        except:
+        except OperationalError:
             # DATABASE DOES NOT EXIST YET -> Create it
             self._create_database()
             Base.metadata.create_all(self.engine)
@@ -212,25 +212,26 @@ class PostgresStore(DocumentStore):
                     session.add(file_obj)
                     session.flush()
 
-                # Get or create Page objects
-                page_objs = []
-                for number in pages:
-                    page = session.scalar(select(Page).where(Page.file_id == file_obj.id, Page.number == number))
-                    if not page:
-                        page = Page(file_id = file_obj.id, number = number)
-                        session.add(page)
-                        session.flush()
-                    page_objs.append(page)
+                # Get or create Page objects (bulk lookup, then create the missing ones)
+                unique_numbers      = sorted(set(pages))
+                existing_pages      = {
+                    page.number: page
+                    for page in session.scalars(select(Page).where(Page.file_id == file_obj.id, Page.number.in_(unique_numbers)))
+                }
+                new_pages           = [Page(file_id = file_obj.id, number = number) for number in unique_numbers if number not in existing_pages]
 
-                # Get or create Doctype objects
-                doctype_objs = []
-                for dt_name in doctypes:
-                    doctype_obj = session.scalar(select(Doctype).where(Doctype.name == dt_name))
-                    if not doctype_obj:
-                        doctype_obj = Doctype(name = dt_name)
-                        session.add(doctype_obj)
-                        session.flush()
-                    doctype_objs.append(doctype_obj)
+                # Get or create Doctype objects (bulk lookup, then create the missing ones)
+                unique_doctypes     = list(dict.fromkeys(doctypes))
+                existing_doctypes   = {
+                    doctype.name: doctype
+                    for doctype in session.scalars(select(Doctype).where(Doctype.name.in_(unique_doctypes)))
+                }
+                new_doctypes        = [Doctype(name = name) for name in unique_doctypes if name not in existing_doctypes]
+
+                session.add_all(new_pages + new_doctypes)
+                session.flush()
+                existing_pages.update({page.number: page for page in new_pages})
+                existing_doctypes.update({doctype.name: doctype for doctype in new_doctypes})
 
                 # Create Document
                 if identifier is None:
@@ -243,17 +244,11 @@ class PostgresStore(DocumentStore):
                 session.flush()
                 doc_id = doc.id
 
-                # Create PageAssignments (doc ↔ page many-to-many)
-                for page in page_objs:
-                    assignment = session.scalar(select(PageAssignment).where(PageAssignment.document_id == doc.id, PageAssignment.page_id == page.id))
-                    if not assignment:
-                        assignment = PageAssignment(document_id = doc.id, page_id = page.id)
-                        session.add(assignment)
+                # Create PageAssignments (document is new, so every assignment is fresh)
+                session.add_all([PageAssignment(document_id = doc.id, page_id = existing_pages[number].id) for number in unique_numbers])
 
                 # Create DoctypeAssignments (doc ↔ doctype many-to-many)
-                for doctype_obj in doctype_objs:
-                    assignment = DoctypeAssignment(document_id = doc.id, doctype_id = doctype_obj.id)
-                    session.add(assignment)
+                session.add_all([DoctypeAssignment(document_id = doc.id, doctype_id = existing_doctypes[name].id) for name in unique_doctypes])
 
                 session.commit()
 
@@ -318,18 +313,21 @@ class PostgresStore(DocumentStore):
             else:
                 target_file = cur_file
 
-            # Pages update: Remove old assignments; get existing pages (path + number (+ case implicitely)), create it otherwise
+            # Pages update: Remove old assignments; get existing pages (path + number (+ case implicitly)), create it otherwise
             # Note: Pages are not re-assigned directly, due to a possible restructuring
             pages_to_reassign = []
             if pages is not None:
                 session.query(PageAssignment).filter(PageAssignment.document_id == identifier).delete()
-                for number in pages:
-                    page = session.execute(select(Page).where(Page.file_id == target_file.id).where(Page.number == number)).scalar_one_or_none()
-                    if page is None:
-                        page = Page(file_id = target_file.id, number = number)
-                        session.add(page)
-                        session.flush()
-                    pages_to_reassign.append(page.id)
+                unique_numbers  = sorted(set(pages))
+                existing_pages  = {
+                    page.number: page
+                    for page in session.scalars(select(Page).where(Page.file_id == target_file.id, Page.number.in_(unique_numbers)))
+                }
+                new_pages       = [Page(file_id = target_file.id, number = number) for number in unique_numbers if number not in existing_pages]
+                session.add_all(new_pages)
+                session.flush()
+                existing_pages.update({page.number: page for page in new_pages})
+                pages_to_reassign = [existing_pages[number].id for number in unique_numbers]
 
             # If path changed but pages didn't, move pages to new file
             elif path is not None:
@@ -339,23 +337,22 @@ class PostgresStore(DocumentStore):
 
             # Now assign new pages
             for page_id in pages_to_reassign:
-                assignment = PageAssignment(page_id = page_id, document_id = identifier)
-                try:
-                    session.add(assignment)
-                except IntegrityError:
-                    session.rollback()
-                    raise UniquePageToDocumentAssignmentException
+                session.add(PageAssignment(page_id = page_id, document_id = identifier))
 
             # Doctype update: Delete all previous assignments; Create new doctype is necessary; Assign it
             if doctypes is not None:
                 session.query(DoctypeAssignment).filter(DoctypeAssignment.document_id == identifier).delete()
-                for name in doctypes:
-                    dt = session.execute(select(Doctype).where(Doctype.name == name)).scalar_one_or_none()
-                    if dt is None:
-                        dt = Doctype(name = name)
-                        session.add(dt)
-                        session.flush()
-                    session.add(DoctypeAssignment(doctype_id = dt.id, document_id = identifier))
+                unique_names        = list(dict.fromkeys(doctypes))
+                existing_doctypes   = {
+                    doctype.name: doctype
+                    for doctype in session.scalars(select(Doctype).where(Doctype.name.in_(unique_names)))
+                }
+                new_doctypes        = [Doctype(name = name) for name in unique_names if name not in existing_doctypes]
+                session.add_all(new_doctypes)
+                session.flush()
+                existing_doctypes.update({doctype.name: doctype for doctype in new_doctypes})
+                for name in unique_names:
+                    session.add(DoctypeAssignment(doctype_id = existing_doctypes[name].id, document_id = identifier))
 
                 # Delete orphaned doctypes — no longer used anywhere
                 orphan_stmt     = select(Doctype).where(~exists().where(DoctypeAssignment.doctype_id == Doctype.id))

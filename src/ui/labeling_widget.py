@@ -32,7 +32,7 @@ def _create_page_item(
         pixmap:           QPixmap,
     ) -> QGraphicsRectItem:
     """
-    A method to create a QGraphicsRectItem with a child widget QGraphicsPixmapItem, whoch is assigned a pixmap (can be empty).
+    A method to create a QGraphicsRectItem with a child widget QGraphicsPixmapItem, which is assigned a pixmap (can be empty).
     Note that QGraphicsRectItem position is still at the origin and QGraphicsPixmapItem pixmap is still empty.
 
     Args:
@@ -71,7 +71,7 @@ def _create_page_item(
     fade_out_anim.finished.connect(lambda: pixmap_item.setPixmap(pixmap))
     pixmap_item.fade_out = fade_out_anim
 
-    rect.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
+    rect.setCacheMode(QGraphicsItem.CacheMode.NoCache)
 
     return rect
 
@@ -233,7 +233,7 @@ class PageCanvas(QGraphicsView):
         """
         Returns the document which is currently selected.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             return self._doc_id_to_doc[self._selected_doc_id]
         else:
             return None
@@ -262,7 +262,7 @@ class PageCanvas(QGraphicsView):
         Args:
             doc_id: The identifier to select or deselect, or None
         """
-        if doc_id == self._selected_doc_id == None:
+        if doc_id is None and self._selected_doc_id is None:
             return
 
         unselect = self._selected_doc_id == doc_id
@@ -271,7 +271,7 @@ class PageCanvas(QGraphicsView):
         self._reset_selection()
 
         # Select pages (if a different document was selected than before)
-        if doc_id and not unselect:
+        if doc_id is not None and not unselect:
             self._apply_selection(doc_id)
 
         self.selection_changed.emit(self._selected_doc_id)
@@ -295,7 +295,7 @@ class PageCanvas(QGraphicsView):
         self._reset_selection()
 
         # Select pages
-        if doc_id:
+        if doc_id is not None:
             self._apply_selection(doc_id)
 
         if state_changed:
@@ -308,7 +308,7 @@ class PageCanvas(QGraphicsView):
         """
         If there is a document currently selected, find, select and focus the previous document.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             first_doc_page  = self._doc_id_to_doc[self._selected_doc_id]['pages'][0]
             first_doc_index = self._page_id_to_index[(self._selected_doc_id, first_doc_page)]
             while first_doc_index > 0:
@@ -326,7 +326,7 @@ class PageCanvas(QGraphicsView):
         """
         If there is a document currently selected, find, select and focus the next document.
         """
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             last_doc_page   = self._doc_id_to_doc[self._selected_doc_id]['pages'][-1]
             last_doc_index  = self._page_id_to_index[(self._selected_doc_id, last_doc_page)]
             while last_doc_index + 1 < len(self._page_items):
@@ -353,7 +353,7 @@ class PageCanvas(QGraphicsView):
         """
         Creates page-wise QRectItems, attaches data and adds them to scene and buffer. Rectangles are buffered, so that only new ones need to be added to the scene.
         """
-        # Mark loading pixmaps as depricated; disconnect loaded pixmaps;
+        # Mark loading pixmaps as deprecated; disconnect loaded pixmaps;
         # TODO: optimize
         for key in self._loading_pixmaps:
             self._removed_pixmaps.add(key)
@@ -431,7 +431,7 @@ class PageCanvas(QGraphicsView):
         self.update_page_arrangement()
 
         # If selected ID still exists and is not filtered -> Highlight, otherwise -> reset selection
-        if self._selected_doc_id:
+        if self._selected_doc_id is not None:
             if self._selected_doc_id in self._doc_id_to_doc and self._satisfies_all_filters(self._doc_id_to_doc[self._selected_doc_id]):
                 first_page  = self._doc_id_to_doc[self._selected_doc_id]['pages'][0]
                 page_id     = (self._selected_doc_id, first_page)
@@ -447,7 +447,7 @@ class PageCanvas(QGraphicsView):
         """
         Reset highlighting for currently selected UI items.
         """
-        if self._selected_doc_id and self._selected_doc_id in self._doc_id_to_rects:
+        if self._selected_doc_id is not None and self._selected_doc_id in self._doc_id_to_rects:
             for rect in self._doc_id_to_rects[self._selected_doc_id]:
                 rect.setPen(QPen(Qt.PenStyle.NoPen))
         self._selected_doc_id = None
@@ -497,17 +497,24 @@ class PageCanvas(QGraphicsView):
             page_key:   A pageKey identifying the page + zoom level
             pixmap:     A loaded pixmap
         """
+        self._worker_jobs.pop(page_key, None)
+        self._loading_pixmaps.discard(page_key)
+
         # Already marked outdated -> Discard
         if page_key in self._removed_pixmaps:
-            self._loading_pixmaps.discard(page_key)
             self._removed_pixmaps.discard(page_key)
-            page_item   = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
-            pixmap_item = page_item.childItems()[0]
-            pixmap_item.setPixmap(self._empty_pixmap)
+            page_item   = self._page_id_to_rect.get((page_key.doc_id, page_key.page_number))
+            if page_item is not None:
+                page_item.childItems()[0].setPixmap(self._empty_pixmap)
             return
 
         # Assign pixmap to page item and play animation (if it was empty before)
-        page_item   = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
+        page_item   = self._page_id_to_rect.get((page_key.doc_id, page_key.page_number))
+
+        # Page item was deleted meanwhile
+        if page_item is None:
+            return
+
         pixmap_item = page_item.childItems()[0]
         from_empty  = pixmap_item.pixmap().isNull()
 
@@ -533,7 +540,6 @@ class PageCanvas(QGraphicsView):
         elif from_empty:
             pixmap_item.fade_in.start()
 
-        self._loading_pixmaps.discard(page_key)
         self._connected_pixmaps.add(page_key)
         cache_key = CacheKey(page_key.doc_id, page_key.page_number)
         self._pixmap_cache.add(cache_key, pixmap, page_key.dpi)
@@ -558,11 +564,13 @@ class PageCanvas(QGraphicsView):
         if scale < UIC.zoom_hide_images:
             for page_key in self._loading_pixmaps:
                 self._removed_pixmaps.add(page_key)
-            for page_key in self._connected_pixmaps:
-                rect = self._page_id_to_rect[(page_key.doc_id, page_key.page_number)]
-                for child in rect.childItems():
-                    child.fade_out.start()
+
+            for rect in self._page_items:
+                pixmap_item = rect.childItems()[0]
+                if not pixmap_item.pixmap().isNull():
+                    pixmap_item.fade_out.start()
             self._connected_pixmaps.clear()
+
             return
 
         # Get required DPI level based on current scene scale
@@ -587,7 +595,7 @@ class PageCanvas(QGraphicsView):
 
         # Mark pages as deprecated that are currently waiting to be loaded, but are no longer visible
         for key in self._loading_pixmaps - visible_page_keys:
-            self._worker_jobs[key].mark_deprecated()
+            self._worker_jobs.pop(key).mark_deprecated()
             self._loading_pixmaps.remove(key)
 
         # Remove non-visible pixmaps from UI
@@ -654,7 +662,7 @@ class PageCanvas(QGraphicsView):
         super().resizeEvent(event)
 
 
-    def scale(self, factor: float):
+    def zoom_by(self, factor: float):
 
         # Anchor point in scene center
         if self._arrangement_type == ArrangementType.LABELING:
@@ -679,7 +687,7 @@ class PageCanvas(QGraphicsView):
         # Wheel + CTRL -> Zoom
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             factor = UIC.zoom_step_factor if event.angleDelta().y() > 0 else 1 / UIC.zoom_step_factor
-            self.scale(factor)
+            self.zoom_by(factor)
             return
 
         # (Pagewise) Horizontal / Vertical Scrolling
@@ -903,10 +911,6 @@ class PageCanvas(QGraphicsView):
                 self.store_operation.emit(action)
 
             self._closest_magnet    = None
-
-        # Right Button ->
-        elif event.button() == Qt.MouseButton.RightButton:
-            pass
 
         # Middle Button -> Translation Stop
         elif event.button() == Qt.MouseButton.MiddleButton:
@@ -1176,7 +1180,7 @@ class MainWindow(QMainWindow):
             dialog      = CreateCaseDialog(store)
             ret_code    = dialog.exec()
             if ret_code == QDialog.DialogCode.Accepted:
-                store.case_store[dialog.case] = dialog.case_root
+                # Note: the case root is already registered by the dialog before insertion
                 self._canvas.update_scene_items()
                 self.new_case_created.emit(dialog.case)
 
@@ -1290,13 +1294,13 @@ class MainWindow(QMainWindow):
         zoom_out_action.setShortcut("Ctrl+-")
         zoom_out_action.setToolTip("Zoom out (Ctrl+Minus)")
         zoom_out_action.setIcon(utils.load_icon(UIC.icon_zoom_out))
-        zoom_out_action.triggered.connect(lambda x: self._canvas.scale(1 / UIC.zoom_step_factor))
+        zoom_out_action.triggered.connect(lambda x: self._canvas.zoom_by(1 / UIC.zoom_step_factor))
         menu_tool_bar.addAction(zoom_out_action)
         zoom_in_action  = QAction(self)
         zoom_in_action.setShortcut("Ctrl++")
         zoom_in_action.setToolTip("Zoom in (Ctrl+Plus)")
         zoom_in_action.setIcon(utils.load_icon(UIC.icon_zoom_in))
-        zoom_in_action.triggered.connect(lambda x: self._canvas.scale(UIC.zoom_step_factor))
+        zoom_in_action.triggered.connect(lambda x: self._canvas.zoom_by(UIC.zoom_step_factor))
         menu_tool_bar.addAction(zoom_in_action)
 
         # Update

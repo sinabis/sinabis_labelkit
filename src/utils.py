@@ -16,14 +16,14 @@ from src.ui.data_classes import UIConstants as UIC
 
 def color_from_class(text: str, saturation: int = 200, light: int = 60, alpha: int = 200) -> QColor:
     """
-    Genereates a deterministic hue for give string. While the saturation and light factors for a HSL color remain fixed, the hue is generated.
-    This could be useful for visually distint prediction labels in a UI. Returns grey if the text is None
+    Generates a deterministic hue for give string. While the saturation and light factors for a HSL color remain fixed, the hue is generated.
+    This could be useful for visually distinct prediction labels in a UI. Returns grey if the text is None
 
     Args:
         text:       A string
-        saturation: A fixed stauration in 0-255
+        saturation: A fixed saturation in 0-255
         light:      A fixed light value in 0-255
-        alpha:      A fixed alpha to support transparence in 0-255
+        alpha:      A fixed alpha to support transparency in 0-255
 
     Returns:
         The QColor

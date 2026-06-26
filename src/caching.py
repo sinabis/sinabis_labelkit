@@ -1,5 +1,4 @@
-import time
-
+from collections import OrderedDict
 from collections.abc import KeysView
 from typing import Any
 
@@ -22,9 +21,8 @@ class PriorityCache:
             size: int   The maximum buffer size
         """
         self._size          = size
-        self._data          = {}
+        self._data          = OrderedDict()
         self._priorities    = {}
-        self._last_access   = {}
 
 
     @property
@@ -55,7 +53,7 @@ class PriorityCache:
 
         self._data[key]         = value
         self._priorities[key]   = priority
-        self._last_access[key]  = time.time()
+        self._data.move_to_end(key)
         self._enforce_buffer_size()
         return True
 
@@ -73,7 +71,7 @@ class PriorityCache:
         """
         if key in self._data:
             if min_priority is None or self._priorities[key] >= min_priority:
-                self._last_access[key] = time.time()
+                self._data.move_to_end(key)
                 return self._data[key]
         raise NotInCacheException("Key '{}' not found in cache!".format(key))
 
@@ -100,9 +98,6 @@ class PriorityCache:
 
 
     def _enforce_buffer_size(self):
-        if len(self._data) > self._size:
-            keys_to_remove = sorted(self._last_access.keys(), key = lambda x: self._last_access[x])[:-self._size]
-            for key in keys_to_remove:
-                del self._data[key]
-                del self._priorities[key]
-                del self._last_access[key]
+        while len(self._data) > self._size:
+            key, _ = self._data.popitem(last = False)
+            del self._priorities[key]

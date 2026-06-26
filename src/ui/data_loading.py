@@ -101,7 +101,7 @@ class PdfLoader(FileLoader):
             abs_path    = os.path.join(case_root, self._key.path)
             doc         = convert_from_path(abs_path, first_page = self._key.page_number + 1, last_page = self._key.page_number + 1, dpi = self._key.dpi)[0]
             qpiximage   = doc.toqpixmap()
-        except:
+        except Exception:
             qpiximage   = self._load_fallback_pixmap()
 
         self._signals.loaded.emit(self._key, qpiximage)
@@ -109,17 +109,8 @@ class PdfLoader(FileLoader):
 
 
 @FileLoader.register_loader('.png')
-
-
-
 @FileLoader.register_loader('.jpg')
-
-
-
 @FileLoader.register_loader('.jpeg')
-
-
-
 @FileLoader.register_loader('.bmp')
 class ImageLoader(FileLoader):
 
@@ -132,15 +123,18 @@ class ImageLoader(FileLoader):
         try:
             case_root   = self._case_store[self._key.case]
             abs_path    = os.path.join(case_root, self._key.path)
+
             with Image.open(abs_path) as image:
                 if image.mode != "RGBA":
-                    image = image.convert("RGBA")
+                    image       = image.convert("RGBA")
 
-                data    = image.tobytes("raw", "RGBA")
+                data            = image.tobytes("raw", "RGBA")
+                width, height   = image.size
 
-            qimg        = QImage(data, image.size[0], image.size[1], QImage.Format.Format_RGBA8888)
+            qimg        = QImage(data, width, height, QImage.Format.Format_RGBA8888)
             qpiximage   = QPixmap.fromImage(qimg)
-        except:
+
+        except Exception:
             qpiximage   = self._load_fallback_pixmap()
 
         self._signals.loaded.emit(self._key, qpiximage)
