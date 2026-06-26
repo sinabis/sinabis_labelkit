@@ -165,7 +165,7 @@ class ResolveCasePathDialog(QDialog):
             abs_path = os.path.join(self._path, doc['path'])
             if not os.path.exists(abs_path):
                 valid = False
-                self._progress_msg.appendPlainText("File '{}' does not exist!".format(doc['path']))
+                self._progress_msg.appendPlainText("File '{}' does not exist!".format(abs_path))
             self._progress_bar.setValue(i)
 
         if valid:
@@ -503,6 +503,10 @@ class CreateDoctypeDialog(QDialog):
 
 class CreateCaseDialog(QDialog):
 
+    progress_total      = pyqtSignal(int)
+    progress_advanced   = pyqtSignal(int, str)
+
+
     def __init__(self, store: DocumentStore, parent: QWidget | None = None):
         """
         A dialog to create a new case. The user chooses a valid name, which is not yet in the document store, and selects a root directory where all files are are recursively assigned to the case.
@@ -570,6 +574,10 @@ class CreateCaseDialog(QDialog):
         layout.addWidget(button_box)
         self.setLayout(layout)
 
+        # Marshal progress updates from the worker thread back to the GUI thread
+        self.progress_total.connect(self._on_progress_total)
+        self.progress_advanced.connect(self._on_progress_advanced)
+
 
     @property
     def case(self) -> str | None:
@@ -583,39 +591,76 @@ class CreateCaseDialog(QDialog):
 
     def _store_files(self):
         """
-        Traverses all files recursively and stores them in the document store.
+        Starts a background worker that traverses all files recursively and stores them in the document store.
         """
         if self._case_root is None or self._case_name is None:
             return
 
-        files = utils.ls_rec(self._case_root)
-        self._progress_bar.setMaximum(len(files))
-        unknown_extensions = set()
+        # Register the case root BEFORE inserting docs so loaders can resolve file paths
+        self._store.case_store[self._case_name] = self._case_root
+
+        self._progress_msg.setText("Scanning files ...")
+        self._ok_button.setEnabled(False)
+        self._browse_button.setEnabled(False)
+
+        # Run in background thread so that the UI does not freeze
+        job_callback    = lambda: self._store_files_job()
+        self._future    = WorkerThread(job_callback, self._on_exception, self._on_success)
+        QThreadPool.globalInstance().start(self._future)
+
+
+    def _store_files_job(self):
+        """
+        Traverses all files recursively and stores them in the document store. Runs in a worker thread;
+        progress is reported to the GUI thread via signals.
+        """
+        files               = utils.ls_rec(self._case_root)
+        self.progress_total.emit(len(files))
+        unknown_extensions  = set()
         for i, file in enumerate(files):
-            self._progress_bar.setValue(i)
 
             _, ext = os.path.splitext(file)
             if not FileLoader.supports_extension(ext):
                 if not ext in unknown_extensions:
                     unknown_extensions.add(ext)
                     print("WARNING: Skipped unsupported File Type '{}'".format(ext))
+                self.progress_advanced.emit(i + 1, "Skipped {}".format(file))
                 continue
             elif ext == '.pdf':
                 try:
                     no_pages    = pdf2image.pdfinfo_from_path(file)['Pages']
                 except PDFPageCountError:
                     print("WARNING: Skipped PDF with unsupported page range: '{}'".format(file))
+                    self.progress_advanced.emit(i + 1, "Skipped {}".format(file))
                     continue
                 pages       = list(range(no_pages))
             else:
                 pages       = [0]
 
             local_path  = os.path.relpath(file, self._case_root)
-            self._progress_msg.setText("Inserting {}".format(local_path))
+            self.progress_advanced.emit(i + 1, "Inserting {}".format(local_path))
             self._store.insert(case = self._case_name, path = local_path, pages = pages)
 
+
+    def _on_progress_total(self, total: int):
+        self._progress_bar.setMaximum(total)
+
+
+    def _on_progress_advanced(self, value: int, message: str):
+        self._progress_bar.setValue(value)
+        self._progress_msg.setText(message)
+
+
+    def _on_success(self):
         self._progress_msg.setText("Done")
-        self.accept()
+        QTimer.singleShot(SUCCESS_MESSAGE_MSECS, self.accept)
+
+
+    def _on_exception(self, exception: Exception):
+        self._progress_msg.setText(str(exception))
+        self._ok_button.setEnabled(True)
+        self._browse_button.setEnabled(True)
+        self._future = None
 
 
     def _check_button_states(self):

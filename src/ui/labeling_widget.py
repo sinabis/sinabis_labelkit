@@ -1180,7 +1180,7 @@ class MainWindow(QMainWindow):
             dialog      = CreateCaseDialog(store)
             ret_code    = dialog.exec()
             if ret_code == QDialog.DialogCode.Accepted:
-                store.case_store[dialog.case] = dialog.case_root
+                # Note: the case root is already registered by the dialog before insertion
                 self._canvas.update_scene_items()
                 self.new_case_created.emit(dialog.case)
 
