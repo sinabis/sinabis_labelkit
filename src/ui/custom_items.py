@@ -25,6 +25,9 @@ class MultiColorRectItem(QGraphicsRectItem):
 
     def paint(self, painter: QPainter, options: QStyleOptionGraphicsItem, widget: QWidget | None = None):
 
+        # Save painter state (the view uses DontSavePainterState, so items must restore it themselves)
+        painter.save()
+
         # Get base rect
         rect    = self.rect()
         w, h    = rect.width(), rect.height()
@@ -37,6 +40,8 @@ class MultiColorRectItem(QGraphicsRectItem):
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawRect(rect)
+
+        painter.restore()
 
 
 
@@ -60,6 +65,9 @@ class StripedColorRectItem(QGraphicsRectItem):
 
 
     def paint(self, painter: QPainter, options: QStyleOptionGraphicsItem, widget: QWidget | None = None):
+
+        # Save painter state (the view uses DontSavePainterState, so items must restore it themselves)
+        painter.save()
 
         # Get base rect
         rect    = self.rect()
@@ -91,6 +99,8 @@ class StripedColorRectItem(QGraphicsRectItem):
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawRect(rect)
+
+        painter.restore()
 
 
 
